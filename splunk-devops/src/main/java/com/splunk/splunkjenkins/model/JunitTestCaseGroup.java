@@ -65,6 +65,5 @@ public class JunitTestCaseGroup {
                 ", errors: " + errors +
                 ", total: " + total +
                 ", duration: " + Util.getTimeSpanString(1000L * (long) duration);
-
     }
 }
