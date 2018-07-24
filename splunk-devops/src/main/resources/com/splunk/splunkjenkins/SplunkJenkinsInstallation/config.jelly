@@ -28,6 +28,11 @@
             <f:entry title="${%Raw Events Supported}" field="rawEventEnabled">
                 <f:checkbox default="true"/>
             </f:entry>
+            <f:entry title="${%Queue Type}" field="queueType"
+                     description="${%Type of queue for Splunk events. Changing queue type might cause events to get lost during the transition.}"
+                     help="/descriptorByName/com.splunk.splunkjenkins.SplunkJenkinsInstallation/help/queueType">
+                <f:select />
+            </f:entry>
             <f:entry title="${%Custom Metadata}">
                 <f:repeatable field="metadataItemSet">
                     <st:include page="config.jelly" class="${descriptor.clazz}"/>

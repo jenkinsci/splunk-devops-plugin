@@ -1,8 +1,7 @@
 package com.splunk.splunkjenkins;
 
-import com.splunk.splunkjenkins.model.EventType;
-import com.splunk.splunkjenkins.model.MetaDataConfigItem;
-import com.splunk.splunkjenkins.utils.SplunkLogService;
+import hudson.ExtensionList;
+import hudson.util.ListBoxModel;
 import hudson.Extension;
 import hudson.Util;
 import hudson.util.FormValidation;
@@ -33,13 +32,17 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import com.splunk.splunkjenkins.model.EventType;
+import com.splunk.splunkjenkins.model.MetaDataConfigItem;
+import com.splunk.splunkjenkins.utils.SplunkLogService;
+import com.splunk.splunkjenkins.utils.SplunkQueue;
+import com.splunk.splunkjenkins.utils.DefaultSplunkQueue;
 import static com.splunk.splunkjenkins.Constants.*;
 import static com.splunk.splunkjenkins.utils.LogEventHelper.*;
 import static com.splunk.splunkjenkins.utils.LogEventHelper.getDefaultDslScript;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
-
 
 @Restricted(NoExternalUse.class)
 @Extension
@@ -58,6 +61,7 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
     private long maxEventsBatchSize = 1 << 18;
     private long retriesOnError = 3;
     private boolean rawEventEnabled = true;
+    private String queueType;
     //groovy script path
     private String scriptPath;
     private String metaDataConfig;
@@ -155,6 +159,9 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
             //switch from enable to disable
             SplunkLogService.getInstance().stopWorker();
             SplunkLogService.getInstance().releaseConnection();
+        } else{
+            SplunkQueue newQueue = getSplunkQueue();
+            SplunkLogService.getInstance().setSplunkQueue(newQueue);
         }
         return true;
     }
@@ -322,7 +329,7 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
      */
     public boolean isValid() {
         return enabled && host != null && token != null
-                && jsonUrl != null && rawUrl != null;
+                && queueType != null && jsonUrl != null && rawUrl != null;
     }
 
     /**
@@ -433,6 +440,14 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         this.rawEventEnabled = rawEventEnabled;
     }
 
+    public String getQueueType() {
+        return queueType;
+    }
+
+    public void setQueueType(String queueType) {
+        this.queueType = queueType;
+    }
+
     public String getMetaDataConfig() {
         return metaDataConfig;
     }
@@ -473,6 +488,17 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         this.scriptContent = scriptContent;
     }
 
+    public SplunkQueue getSplunkQueue(){
+        ExtensionList<SplunkQueue> queueList = ExtensionList.lookup(SplunkQueue.class);
+        for (SplunkQueue listItem : queueList) {
+            if(listItem.getClass().getSimpleName().equals(this.queueType)){
+                return listItem;
+            }
+        }
+
+        return new DefaultSplunkQueue();
+    }
+
     public Map toMap() {
         HashMap map = new HashMap();
         map.put("token", this.token);
@@ -481,6 +507,7 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         map.put("host", host);
         map.put("port", port);
         map.put("useSSL", useSSL);
+        map.put("queueType", this.queueType);
         map.put("metaDataConfig", Util.fixNull(defaultMetaData) + Util.fixNull(metaDataConfig));
         map.put("retriesOnError", retriesOnError);
         map.put("metadataHost", metadataHost);
@@ -596,5 +623,18 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
 
     public void setIgnoredJobs(String ignoredJobs) {
         this.ignoredJobs = ignoredJobs;
+    }
+
+    public ListBoxModel doFillQueueTypeItems(){
+        ListBoxModel m = new ListBoxModel();
+
+        ExtensionList<SplunkQueue> queueList = ExtensionList.lookup(SplunkQueue.class);
+
+        // Populate drop down items
+        for (SplunkQueue listItem : queueList) {
+            m.add(listItem.getClass().getSimpleName());
+        }
+
+        return m;
     }
 }
