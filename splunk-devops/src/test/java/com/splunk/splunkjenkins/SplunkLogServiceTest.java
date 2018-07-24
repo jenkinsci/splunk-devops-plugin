@@ -7,11 +7,15 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import com.splunk.splunkjenkins.SplunkJenkinsInstallation;
 import com.splunk.splunkjenkins.model.EventType;
 import com.splunk.splunkjenkins.utils.SplunkLogService;
-import org.junit.*;
 
 import static com.splunk.splunkjenkins.SplunkConfigUtil.verifySplunkSearchResult;
+import static com.splunk.splunkjenkins.model.EventType.SLAVE_INFO;
+import static com.splunk.splunkjenkins.utils.LogEventHelper.getSlaveStats;
+
+import org.junit.*;
 import static org.junit.Assert.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -57,6 +61,12 @@ public class SplunkLogServiceTest extends BaseTest {
         }
         int expected = BATCH_COUNT;
         verifySplunkSearchResult(query, timestamp, expected);
+
+        // Ensure sendBatch method can run
+        Map<String, Map<String, Object>> testSlaveStats = getSlaveStats();
+        LOG.info("Test stats: " + testSlaveStats.toString());
+        LOG.info("Test stat values: " + testSlaveStats.values());
+        SplunkLogService.getInstance().sendBatch(testSlaveStats.values(), SLAVE_INFO);
     }
 
     @Test
