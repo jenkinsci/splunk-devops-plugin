@@ -3,17 +3,14 @@ Splunk for Jenkins
 
 To Install Develop Version
 ----
- - clone the repo
- - `$ mvn package`
- -  That will generate `splunk-devops/target/splunk-devops.hpi` which you can install into Jenkins by the web interface or just put it in the `JENKINS_HOME/plugins` folder.
- - `$ mvn clean verify -Dhost=localhost -Dusername=admin -Dpassword=changeme`
-   to run tests against local splunk instance
-
+ - Clone the repo
+ - Run `$ mvn package` to generate `splunk-devops/target/splunk-devops.hpi`, which you can install into Jenkins via the web interface or just put it in the `$JENKINS_HOME/plugins` folder.
+ - Run `$ mvn clean verify -Dhost=localhost -Dusername=admin -Dpassword=changeme`
+   to run tests against a [local Splunk instance](https://www.splunk.com/en_us/download.html).
 
 To Setup
 ----
 ### Configure plugin
-
  - Go to https://jenkins-url/configure
  - Enter Hostname, Port, and Token
  - Enable RawEvent support if you are using Splunk version 6.3.1511 or later
@@ -57,13 +54,13 @@ splunkins.archive("**/*.log", null, false, "10MB")
 
   ![Screenshot](doc/images/splunk_for_jenkins_post_job.png)
  
+### Customize message queue
+By default, this plugin uses a [LinkedBlockingQueue](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/LinkedBlockingQueue.html) as a message queue for information transferred between Jenkins and Splunk. However, this can be updated if a plugin is installed that leverages the [SplunkQueue](splunk-devops/src/main/java/com/splunk/splunkjenkins/utils/SplunkQueue.java) [ExtensionPoint](https://javadoc.jenkins.io/hudson/ExtensionPoint.html).
+
 Dashboard
 ----
-
-you can get the "Splunk App for Jenkins" App from [splunk base](https://splunkbase.splunk.com/app/3332/)
-
+You can get the "Splunk App for Jenkins" App from [Splunkbase](https://splunkbase.splunk.com/app/3332/).
 
 System Requirement
 -----
-You need enable "HTTP Event Collector" In Splunk to use the plugin,
-please checkout [HTTP Event Collector](http://dev.splunk.com/view/event-collector/SP-CAAAE7G)
+You need enable "HTTP Event Collector" in Splunk to use the plugin, please checkout [HTTP Event Collector](http://dev.splunk.com/view/event-collector/SP-CAAAE7G) and [HTTP Event Collector Walkthrough](http://docs.splunk.com/Documentation/Splunk/7.1.0/Data/HECWalkthrough).

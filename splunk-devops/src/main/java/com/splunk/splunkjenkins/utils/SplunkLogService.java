@@ -1,5 +1,7 @@
 package com.splunk.splunkjenkins.utils;
 
+import hudson.ExtensionList;
+
 import com.google.common.base.Strings;
 import com.splunk.splunkjenkins.SplunkJenkinsInstallation;
 import com.splunk.splunkjenkins.model.EventRecord;
@@ -17,37 +19,43 @@ import shaded.splk.org.apache.http.conn.ssl.TrustStrategy;
 import shaded.splk.org.apache.http.impl.client.HttpClients;
 import shaded.splk.org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import shaded.splk.org.apache.http.ssl.SSLContexts;
+import static com.splunk.splunkjenkins.model.EventType.BATCH_JSON;
 
 import javax.net.ssl.SSLContext;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
-
-import static com.splunk.splunkjenkins.model.EventType.BATCH_JSON;
 
 public class SplunkLogService {
     public static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(SplunkLogService.class.getName());
     private final static int SOCKET_TIMEOUT = 3;
-    private final static int QUEUE_SIZE = 1 << 17;
     int MAX_WORKER_COUNT = Integer.getInteger(SplunkLogService.class.getName() + ".workerCount", 2);
-    BlockingQueue<EventRecord> logQueue;
+    SplunkQueue logQueue;
     List<LogConsumer> workers;
     HttpClient client;
     HttpClientConnectionManager connMgr;
     private AtomicLong incomingCounter = new AtomicLong();
     private AtomicLong outgoingCounter = new AtomicLong();
-    private Lock maintenanceLock = new ReentrantLock();
 
-    private SplunkLogService() {
-        this.logQueue = new LinkedBlockingQueue<EventRecord>(QUEUE_SIZE);
+    public SplunkLogService() {
+        // Read queue type from disk
+        // Make sure chosen type implemented at start-up
+        SplunkJenkinsInstallation config = SplunkJenkinsInstallation.get();
+        try{
+            this.logQueue = config.getSplunkQueue();
+            LOG.info("SplunkLogService | Intializing with queue type from disk: " + this.logQueue.getClass().getSimpleName());
+        } catch (Exception e){
+            this.logQueue = new DefaultSplunkQueue();
+            LOG.info("SplunkLogService | Intializing with default queue: " + e.getMessage());
+        }
+        if(!(this.logQueue instanceof SplunkQueue)){
+            LOG.log(Level.WARNING, "SplunkLogService | Unable to intialize with proper queue, using DefaultSplunkQueue");
+            this.logQueue = new DefaultSplunkQueue();
+        }
         this.workers = new ArrayList<LogConsumer>();
     }
 
@@ -176,35 +184,12 @@ public class SplunkLogService {
     }
 
     public boolean enqueue(EventRecord record) {
-        if (SplunkJenkinsInstallation.get().isEventDisabled(record.getEventType())) {
-            LOG.log(Level.FINE, "config invalid or eventType {0} is disabled, can not send {1}", new String[]{record.getEventType().toString(), record.getShortDescription()});
-            return false;
-        }
-        boolean added = logQueue.offer(record);
+        // Insert record into queue, analyze capacity restrictions
+        boolean added = logQueue.enqueue(record);
         if (!added) {
-            LOG.log(Level.SEVERE, "failed to send message due to queue is full");
-            if (maintenanceLock.tryLock()) {
-                try {
-                    //the event in the queue may have format issue and caused congestion, remove non-critical failed events
-                    List<EventRecord> stuckRecords = new ArrayList<>(logQueue.size());
-                    logQueue.drainTo(stuckRecords);
-                    LOG.log(Level.SEVERE, "jenkins is too busy or has too few workers, clearing up queue");
-                    for (EventRecord queuedRecord : stuckRecords) {
-                        if (!queuedRecord.getEventType().equals(EventType.BUILD_REPORT)) {
-                            continue;
-                        }
-                        boolean enqueued = logQueue.offer(queuedRecord);
-                        if (!enqueued) {
-                            LOG.log(Level.SEVERE, "failed to add {0}", record.getShortDescription());
-                            break;
-                        }
-                    }
-                } finally {
-                    maintenanceLock.unlock();
-                }
-            }
             return false;
         }
+
         if (workers.size() < MAX_WORKER_COUNT) {
             synchronized (workers) {
                 int worksToCreate = MAX_WORKER_COUNT - workers.size();
@@ -249,12 +234,29 @@ public class SplunkLogService {
         return outgoingCounter.get();
     }
 
+    public SplunkQueue getQueue() {
+        return logQueue;
+    }
+
     public long getQueueSize() {
         return this.logQueue.size();
     }
 
     public HttpClient getClient() {
         return client;
+    }
+
+    public void setSplunkQueue(SplunkQueue newQueue){
+        LOG.info("SplunkLogService | Changing queue type from "
+            + logQueue.getClass().getSimpleName() + " to "
+            + newQueue.getClass().getSimpleName());
+
+        if(newQueue.getClass().equals(logQueue.getClass())){
+            LOG.info("SplunkLogService | Queue of proper type, no change needed");
+            return;
+        } else{
+            this.logQueue = newQueue;
+        }
     }
 
     private static class InstanceHolder {
