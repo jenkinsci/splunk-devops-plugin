@@ -47,7 +47,7 @@ public class LabelConsoleLineStream extends FilterOutputStream {
         String line = decoder.decodeLine(branch.getBuffer(), branch.size());
         // reuse the buffer under normal circumstances
         branch.reset();
-        if (StringUtils.isNotBlank(line)) {
+        if (line != null && StringUtils.isNotBlank(ANSI_COLOR_ESCAPE.matcher(line).replaceAll(""))) {
             line = ANSI_COLOR_ESCAPE.matcher(line).replaceAll("");
             EventRecord record = new EventRecord(line, CONSOLE_LOG);
             record.setSource(source);
