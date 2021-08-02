@@ -19,7 +19,7 @@ import java.io.PrintStream;
 Helper class that delegates BuildListener functionality to underlying TaskListener
  */
 public class TeeBuildListener implements BuildListener, Closeable, SerializableOnlyOverRemoting {
-    private final OutputStream out;
+    private final transient OutputStream out;
     @SuppressFBWarnings(
             value = {"SE_BAD_FIELD"},
             justification = "using Replacement anyway, fields here are irrelevant"
