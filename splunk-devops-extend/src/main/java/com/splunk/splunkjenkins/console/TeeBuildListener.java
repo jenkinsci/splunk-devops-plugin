@@ -19,12 +19,17 @@ import java.io.PrintStream;
 Helper class that delegates BuildListener functionality to underlying TaskListener
  */
 public class TeeBuildListener implements BuildListener, Closeable, SerializableOnlyOverRemoting {
-    private final transient OutputStream out;
+    private static final long serialVersionUID = 1L;
     @SuppressFBWarnings(
-            value = {"SE_BAD_FIELD"},
+            value = {"SE_TRANSIENT_FIELD_NOT_RESTORED"},
             justification = "using Replacement anyway, fields here are irrelevant"
     )
-    private final PrintStream ps;
+    private final transient OutputStream out;
+    @SuppressFBWarnings(
+            value = {"SE_TRANSIENT_FIELD_NOT_RESTORED"},
+            justification = "using Replacement anyway, fields here are irrelevant"
+    )
+    private final transient PrintStream ps;
     public String source;
 
     TeeBuildListener(OutputStream out, String source) throws IOException {
