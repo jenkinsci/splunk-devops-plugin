@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 public class ConsoleRecordCacheUtils {
     private static final int CACHED_LINES_LIMIT;
-    private transient static final Logger LOGGER = Logger.getLogger(SplunkConsoleTaskListenerDecorator.class.getName());
+    private transient static final Logger LOGGER = Logger.getLogger(ConsoleRecordCacheUtils.class.getName());
     private transient static final ConcurrentLinkedQueue<EventRecord> consoleQueue = new ConcurrentLinkedQueue<>();
 
     static {

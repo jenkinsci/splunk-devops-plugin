@@ -1,7 +1,9 @@
 package com.splunk.splunkjenkins;
 
-import com.cloudbees.workflow.rest.external.*;
-import com.splunk.splunkjenkins.console.SplunkTaskListenerFactory;
+import com.cloudbees.workflow.rest.external.ErrorExt;
+import com.cloudbees.workflow.rest.external.FlowNodeExt;
+import com.cloudbees.workflow.rest.external.StageNodeExt;
+import com.cloudbees.workflow.rest.external.StatusExt;
 import com.splunk.splunkjenkins.model.LoggingJobExtractor;
 import hudson.Extension;
 import hudson.model.Result;
@@ -52,7 +54,6 @@ public class PipelineRunSupport extends LoggingJobExtractor<WorkflowRun> {
                     info.put("stages", labeledChunks);
                 }
             }
-            SplunkTaskListenerFactory.removeCache(workflowRun);
         }
         return info;
     }
