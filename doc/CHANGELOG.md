@@ -1,3 +1,6 @@
+### 1.9.10 (April 5, 2022) 
+- Add CustomLoggersConfig global configuration that allows for specificying custom loggers to always send to Splunk regardless of log level, thanks to [Pierson Yieh](https://github.com/pyieh)
+
 ### 1.9.9 (January 8, 2022)
 - JENKINS-67492 fix xml entity not declared error when parsing console node
 ### 1.9.8 (December 18, 2021)
