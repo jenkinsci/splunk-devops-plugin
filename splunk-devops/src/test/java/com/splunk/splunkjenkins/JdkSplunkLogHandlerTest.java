@@ -36,4 +36,8 @@ public class JdkSplunkLogHandlerTest extends BaseTest {
         verifySplunkSearchResult(message + " level=INFO", 1);
     }
 
+    @Test
+    public void publishCustomLogger() throws Exception {
+
+    }
 }

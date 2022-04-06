@@ -4,17 +4,25 @@ import com.splunk.splunkjenkins.model.EventRecord;
 import com.splunk.splunkjenkins.model.EventType;
 import com.splunk.splunkjenkins.utils.LogConsumer;
 import com.splunk.splunkjenkins.utils.SplunkLogService;
+import hudson.logging.LogRecorder;
 import hudson.model.Computer;
 import jenkins.model.Jenkins;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.*;
+import java.util.logging.Filter;
 import java.util.logging.Formatter;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 import static com.splunk.splunkjenkins.Constants.JDK_FINE_LOG_BATCH;
 
@@ -76,6 +84,28 @@ public class JdkSplunkLogHandler extends Handler {
         }
         SplunkLogService.getInstance().sendBatch(copyList, EventType.LOG);
     }
+
+    @Override
+    public boolean isLoggable(LogRecord record) {
+        if (!record.getLoggerName().contains(JdkSplunkLogHandler.class.getName())
+                && !record.getLoggerName().contains(CustomLoggersConfig.class.getName())) { // ignores self references
+            CustomLoggersConfig clConfig = CustomLoggersConfig.get();
+            if (clConfig != null) {
+                for (CustomLoggerItem clItem : clConfig.getCustomLoggers()) {
+                    LogRecorder logRecorder = clItem.getLogRecorder();
+                    if (logRecorder != null && logRecorder.targets != null) {
+                        for (LogRecorder.Target target : logRecorder.targets) {
+                            if (Boolean.TRUE.equals(target.matches(record))) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return super.isLoggable(record);
+    }
+
 
     @Override
     public void close() throws SecurityException {
