@@ -16,7 +16,7 @@ import java.util.Map;
 public class CustomLoggerItem implements Describable<CustomLoggerItem> {
     private static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(CustomLoggerItem.class.getName());
 
-    private static transient final LogRecorderManager logRecorderManager = Jenkins.getInstanceOrNull().getLog();
+    private static transient final LogRecorderManager logRecorderManager = Jenkins.getInstance().getLog();
 
     String customLoggerName;
     LogRecorder logRecorder;
