@@ -11,7 +11,7 @@
 
     <groupId>com.splunk.splunkins</groupId>
     <artifactId>pom</artifactId>
-    <version>1.9.10-SNAPSHOT</version>
+    <version>${revision}${changelist}</version>
     <packaging>pom</packaging>
 
     <name>Splunk Plugin Main Module</name>
@@ -35,10 +35,11 @@
         <connection>scm:git:git://github.com/jenkinsci/splunk-devops-plugin.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/jenkinsci/splunk-devops-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/splunk-devops-plugin</url>
-        <tag>pom-1.3</tag>
     </scm>
 
     <properties>
+        <revision>1.9.10</revision>
+        <changelist>-SNAPSHOT</changelist>
         <!-- *.html files are in UTF-8, and *.properties are in iso-8859-1, so this configuration is acturally incorrect,
         but this suppresses a warning from Maven, and as long as we don't do filtering we should be OK. -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -53,7 +54,7 @@
         <findbugs-maven-plugin.version>3.0.1</findbugs-maven-plugin.version>
         <java.level>8</java.level>
         <!-- jenkins requirement -->
-        <jenkins.version>2.60.3</jenkins.version>
+        <jenkins.version>2.235.5</jenkins.version>
         <spotbugs.failOnError>false</spotbugs.failOnError>
         <surefire.timeout>600</surefire.timeout>
     </properties>
@@ -106,6 +107,36 @@
                     <artifactId>jsr305</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.26</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>1.7.26</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>1.7.26</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>1.7.26</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-api</artifactId>
+            <version>1137.v36a_8153e5c69</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>structs</artifactId>
+            <version>1.23</version>
         </dependency>
     </dependencies>
     <profiles>

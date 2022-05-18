@@ -21,7 +21,7 @@ import static com.splunk.splunkjenkins.model.EventType.CONSOLE_LOG;
 
 @Extension(optional = true)
 public class SplunkTaskListenerFactory implements TaskListenerDecorator.Factory {
-    private static final Logger LOGGER = Logger.getLogger(SplunkConsoleTaskListenerDecorator.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SplunkTaskListenerFactory.class.getName());
     private static final boolean ENABLE_REMOTE_DECORATOR = Boolean.parseBoolean(System.getProperty("splunkins.enableRemoteTaskListenerDecorator", "true"));
     private static final transient LoadingCache<WorkflowRun, SplunkConsoleTaskListenerDecorator> cachedDecorator = CacheBuilder.newBuilder()
             .weakKeys()
@@ -61,6 +61,11 @@ public class SplunkTaskListenerFactory implements TaskListenerDecorator.Factory 
             LOGGER.finer("failed to load cached decorator");
         }
         return null;
+    }
+
+    @Override
+    public boolean isAppliedBeforeMainDecorator() {
+        return true;
     }
 
     public static void removeCache(WorkflowRun run) {
