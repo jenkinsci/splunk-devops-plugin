@@ -23,9 +23,6 @@
             <url>http://opensource.org/licenses/MIT</url>
         </license>
     </licenses>
-    <properties>
-        <jenkins.version>2.249.1</jenkins.version>
-    </properties>
     <developers>
         <developer>
             <id>djenkins</id>
@@ -225,16 +222,10 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-api</artifactId>
-            <version>1137.v36a_8153e5c69</version>
-        </dependency>
-        <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>structs</artifactId>
             <version>1.23</version>
         </dependency>
-
     </dependencies>
 
 </project>
