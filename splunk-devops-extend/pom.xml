@@ -103,6 +103,12 @@
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>script-security</artifactId>
             <version>1.77</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.jenkins.plugins</groupId>
+                    <artifactId>caffeine-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
