@@ -8,10 +8,10 @@ import hudson.model.Result;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.flow.FlowExecution;
 import org.jenkinsci.plugins.workflow.graphanalysis.ForkScanner;
-import org.jenkinsci.plugins.workflow.graphanalysis.LabelledChunkFinder;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import io.jenkins.blueocean.rest.impl.pipeline.PipelineNodeGraphVisitor;
 import io.jenkins.blueocean.rest.impl.pipeline.FlowNodeWrapper;
+import org.jenkinsci.plugins.workflow.pipelinegraphanalysis.StageChunkFinder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +36,7 @@ public class PipelineRunSupport extends LoggingJobExtractor<WorkflowRun> {
                 PipelineNodeGraphVisitor pipelineVisitor = new PipelineNodeGraphVisitor(workflowRun);
 
                 //LabelledChunkFinder to find stages and parallel branches
-                ForkScanner.visitSimpleChunks(execution.getCurrentHeads(), visitor, new LabelledChunkFinder());
+                ForkScanner.visitSimpleChunks(execution.getCurrentHeads(), visitor, new StageChunkFinder());
                 Collection<StageNodeExt> nodes = visitor.getStages();
                 Collection<FlowNodeWrapper> pipelineNodes = pipelineVisitor.getPipelineNodes();
 
