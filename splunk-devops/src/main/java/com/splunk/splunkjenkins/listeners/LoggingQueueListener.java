@@ -38,7 +38,7 @@ public class LoggingQueueListener extends QueueListener {
     private final static ConcurrentHashMap<Long, Long> queuePhase = new ConcurrentHashMap<Long, Long>();
     // default is 3 question masks ???, see also hudson/model/Messages
     // due to access policy hudson/model/Messages must not be used, hard code it here
-    private final String QUEUE_UNKNOWN_MSG = "???";
+    private final static String QUEUE_UNKNOWN_MSG = "???";
 
     @Override
     public void onEnterWaiting(Queue.WaitingItem wi) {

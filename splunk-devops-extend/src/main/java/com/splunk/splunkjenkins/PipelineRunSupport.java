@@ -11,23 +11,22 @@ import org.jenkinsci.plugins.workflow.graphanalysis.ForkScanner;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import io.jenkins.blueocean.rest.impl.pipeline.PipelineNodeGraphVisitor;
 import io.jenkins.blueocean.rest.impl.pipeline.FlowNodeWrapper;
-import org.jenkinsci.plugins.workflow.pipelinegraphanalysis.StageChunkFinder;
+import org.jenkinsci.plugins.workflow.actions.TimingAction;
+import org.jenkinsci.plugins.workflow.cps.nodes.StepStartNode;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
 @Extension
 public class PipelineRunSupport extends LoggingJobExtractor<WorkflowRun> {
-    private static final Logger LOG = Logger.getLogger(PipelineRunSupport.class.getName());
 
     @Override
     public Map<String, Object> extract(WorkflowRun workflowRun, boolean jobCompleted) {
+
         Map<String, Object> info = new HashMap<String, Object>();
         if (jobCompleted) {
             FlowExecution execution = workflowRun.getExecution();
@@ -35,20 +34,37 @@ public class PipelineRunSupport extends LoggingJobExtractor<WorkflowRun> {
                 WorkspaceChunkVisitor visitor = new WorkspaceChunkVisitor(workflowRun);
                 PipelineNodeGraphVisitor pipelineVisitor = new PipelineNodeGraphVisitor(workflowRun);
 
-                //LabelledChunkFinder to find stages and parallel branches
-                ForkScanner.visitSimpleChunks(execution.getCurrentHeads(), visitor, new StageChunkFinder());
+                ForkScanner.visitSimpleChunks(execution.getCurrentHeads(), visitor, new SplunkStageChunkFinder());
                 Collection<StageNodeExt> nodes = visitor.getStages();
                 Collection<FlowNodeWrapper> pipelineNodes = pipelineVisitor.getPipelineNodes();
 
                 Map<String, String> execNodes = visitor.getWorkspaceNodes();
                 Map<String, String> parallelNodeStages = visitor.getParallelNodes();
+
                 if (!nodes.isEmpty()) {
                     List<Map> labeledChunks = new ArrayList<Map>(nodes.size());
                     for (StageNodeExt stageNodeExt : nodes) {
                         for (FlowNodeWrapper nodeFlowNodeWrapper : pipelineNodes) {
-                            if (nodeFlowNodeWrapper.getDisplayName().equals(stageNodeExt.getName())
-                                    || ("Branch: " + nodeFlowNodeWrapper.getDisplayName()).equals(stageNodeExt.getName())) {
-                                Map<String, Object> stage = flowNodeWrapperToMap(nodeFlowNodeWrapper, execNodes);
+                            if ((String.valueOf(nodeFlowNodeWrapper.getType())).equals("STAGE") && nodeFlowNodeWrapper.getDisplayName().equals(stageNodeExt.getName())
+                                    || (String.valueOf(nodeFlowNodeWrapper.getType())).equals("PARALLEL") && nodeFlowNodeWrapper.getDisplayName().equals(stageNodeExt.getName())
+                                    || (((String.valueOf(nodeFlowNodeWrapper.getType())).equals("PARALLEL") && (nodeFlowNodeWrapper.getNode().getDisplayName()).equals(stageNodeExt.getName())))) {
+
+                                Map<String, Object>  stage = flowNodeWrapperToMap(nodeFlowNodeWrapper, execNodes);
+
+                                //remove duplicate stages
+                                int counter = 0;
+                                Boolean control = false;
+                                if (!labeledChunks.isEmpty()) {
+                                    for (Map labeledChunk : labeledChunks) {
+                                        if (String.valueOf(labeledChunk.get("name")).equals(nodeFlowNodeWrapper.getDisplayName())) {
+                                            stage = labeledChunk;
+                                            control = true;
+                                            break;
+                                        }
+                                        counter++;
+                                    }
+                                }
+
                                 List<Map<String, Object>> children = new ArrayList<>();
                                 for (FlowNodeExt childNode : stageNodeExt.getStageFlowNodes()) {
                                     children.add(flowNodeToMap(childNode, execNodes));
@@ -59,7 +75,12 @@ public class PipelineRunSupport extends LoggingJobExtractor<WorkflowRun> {
                                         stage.put("enclosing_stage", parallelNodeStages.get(stageNodeExt.getId()));
                                     }
                                 }
-                                labeledChunks.add(stage);
+                                if (control) {
+                                    labeledChunks.set(counter, stage);
+                                } else {
+                                    labeledChunks.add(stage);
+                                }
+                                break;
                             }
                         }
                     }
@@ -107,9 +128,9 @@ public class PipelineRunSupport extends LoggingJobExtractor<WorkflowRun> {
         result.put("name", node.getDisplayName());
         result.put("id", node.getId());
         result.put("status", node.getStatus().getResult().toString());
-        result.put("duration", node.getTiming().getTotalDurationMillis() / 1000f);
+        result.put("duration", (TimingAction.getStartTime(((StepStartNode)node.getNode()).getEndNode()) - TimingAction.getStartTime(node.getNode())) / 1000f);
         result.put("pause_duration", node.getTiming().getPauseDurationMillis() / 1000f);
-        result.put("start_time", node.getTiming().getStartTimeMillis() / 1000f);
+        result.put("start_time", TimingAction.getStartTime(node.getNode()) / 1000f);
         if (!(StringUtils.isEmpty(node.getCauseOfFailure()))) {
             result.put("error", node.getCauseOfFailure());
             result.put("error_type", "error");
@@ -139,4 +160,5 @@ public class PipelineRunSupport extends LoggingJobExtractor<WorkflowRun> {
                 return status.toString();
         }
     }
+
 }
