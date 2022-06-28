@@ -51,6 +51,8 @@ public class PipelineRunSupport extends LoggingJobExtractor<WorkflowRun> {
 
                                 Map<String, Object>  stage = flowNodeWrapperToMap(nodeFlowNodeWrapper, execNodes);
 
+                                List<Map<String, Object>> children = new ArrayList<>();
+
                                 //remove duplicate stages
                                 int counter = 0;
                                 Boolean control = false;
@@ -59,13 +61,16 @@ public class PipelineRunSupport extends LoggingJobExtractor<WorkflowRun> {
                                         if (String.valueOf(labeledChunk.get("name")).equals(nodeFlowNodeWrapper.getDisplayName())) {
                                             stage = labeledChunk;
                                             control = true;
+                                            if (labeledChunk.containsKey("children") && !String.valueOf(labeledChunk.get("children")).isEmpty()) {
+                                                children = (List<Map<String, Object>>) labeledChunk.get("children");
+                                            }
                                             break;
                                         }
                                         counter++;
                                     }
                                 }
 
-                                List<Map<String, Object>> children = new ArrayList<>();
+
                                 for (FlowNodeExt childNode : stageNodeExt.getStageFlowNodes()) {
                                     children.add(flowNodeToMap(childNode, execNodes));
                                 }
