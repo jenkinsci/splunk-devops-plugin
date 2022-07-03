@@ -92,7 +92,7 @@ public class WorkspaceChunkVisitor extends ChunkVisitor {
                     execNodeName = workspaceAction.getNode();
                     execNodeStartId = nodeStep.getId();
                     if (StringUtils.isEmpty(execNodeName)) {
-                        execNodeName = Constants.MASTER;
+                        execNodeName = Constants.BUILT_IN_NODE;
                     }
                     LOG.log(Level.FINE, "found workspace node id={0}, name={1}", new String[]{execNodeStartId, execNodeName});
                 }

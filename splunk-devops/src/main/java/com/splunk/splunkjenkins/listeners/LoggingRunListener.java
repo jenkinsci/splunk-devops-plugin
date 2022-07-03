@@ -156,7 +156,7 @@ public class LoggingRunListener extends RunListener<Run> {
             }
             nodeName = executor.getOwner().getName();
             if (StringUtils.isEmpty(nodeName)) {
-                nodeName = Constants.MASTER;
+                nodeName = Constants.BUILT_IN_NODE;
             }
         } else if (run instanceof AbstractBuild) {
             nodeName = ((AbstractBuild) run).getBuiltOnStr();
