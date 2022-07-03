@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.splunk.splunkins</groupId>
         <artifactId>pom</artifactId>
-        <version>1.9.10-SNAPSHOT</version>
+        <version>1.10.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>splunk-devops-extend</artifactId>
@@ -20,9 +20,6 @@
             <url>http://opensource.org/licenses/MIT</url>
         </license>
     </licenses>
-    <properties>
-        <jenkins.version>2.138.4</jenkins.version>
-    </properties>
     <developers>
         <developer>
             <id>fengxx</id>
@@ -63,8 +60,8 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-api</artifactId>
-            <version>2.36</version>
-            <!--TaskListenerDecorator API is stable since 2.36-->
+            <version>1165.v02c3db_a_6b_e36</version>
+            <!--TaskListenerDecorator API beta feature-->
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
@@ -74,18 +71,17 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-step-api</artifactId>
-            <version>2.19</version>
+            <version>625.vd896b_f445a_f8</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-cps</artifactId>
-            <version>2.53</version>
+            <version>2648.2651.v230593e03e9f</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-support</artifactId>
-            <version>3.3</version>
-            <scope>test</scope>
+            <version>3.8</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
@@ -97,22 +93,6 @@
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-multibranch</artifactId>
             <version>2.19</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>structs</artifactId>
-            <version>1.17</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>scm-api</artifactId>
-            <version>2.2.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>junit</artifactId>
-            <version>1.18</version>
             <scope>test</scope>
         </dependency>
         <dependency>

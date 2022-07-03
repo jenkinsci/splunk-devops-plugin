@@ -42,8 +42,8 @@ public class StageStepNodesTest {
         long startTime = System.currentTimeMillis();
         DumbSlave node = r.createOnlineSlave(new LabelAtom("ci-1"));
         DumbSlave node1 = r.createOnlineSlave(new LabelAtom("ci-2"));
-        WorkflowJob p = r.jenkins.createProject(WorkflowJob.class, "p");
-        p.setDefinition(new CpsFlowDefinition(jobScript));
+        WorkflowJob p = r.jenkins.createProject(WorkflowJob.class, "stage-node-job");
+        p.setDefinition(new CpsFlowDefinition(jobScript,true));
         WorkflowRun b1 = r.assertBuildStatusSuccess(p.scheduleBuild2(0));
         assertFalse(b1.isBuilding());
         r.assertLogContains("hello", b1);
