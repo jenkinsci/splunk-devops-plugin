@@ -12,6 +12,7 @@ import org.jenkinsci.plugins.workflow.log.TaskListenerDecorator;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -36,6 +37,14 @@ public class SplunkTaskListenerFactory implements TaskListenerDecorator.Factory 
                     return decorator;
                 }
             });
+
+    @Override
+    /*
+       data stream is passed to splunk decorator first (it sees data in the last due to decorator behavior)
+     */
+    public boolean isAppliedBeforeMainDecorator() {
+        return true;
+    }
 
     @CheckForNull
     @Override
