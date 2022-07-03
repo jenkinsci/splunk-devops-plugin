@@ -93,7 +93,7 @@ public class MetaDataConfigItem implements Describable<MetaDataConfigItem> {
 
     @Override
     public Descriptor<MetaDataConfigItem> getDescriptor() {
-        return Jenkins.getInstance().getDescriptor(getClass());
+        return Jenkins.getInstance().getDescriptor(MetaDataConfigItem.class);
     }
 
     @Extension
