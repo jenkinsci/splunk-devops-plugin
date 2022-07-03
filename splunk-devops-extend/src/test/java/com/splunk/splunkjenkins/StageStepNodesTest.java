@@ -31,6 +31,19 @@ public class StageStepNodesTest {
             "      echo \"hello\"\n" +
             "    }\n" +
             "}";
+    private String nestedStage = "node{\n" +
+            "    stage('build') {\n" +
+            "        stage('linux'){\n" +
+            "            echo \"hello\"\n" +
+            "        }\n" +
+            "        stage('windows'){\n" +
+            "            echo \"hello\"\n" +
+            "            stage('build c'){\n" +
+            "                echo \"hello\"\n" +
+            "            }\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
 
     @Before
     public void setUp() throws Exception {
@@ -43,7 +56,7 @@ public class StageStepNodesTest {
         DumbSlave node = r.createOnlineSlave(new LabelAtom("ci-1"));
         DumbSlave node1 = r.createOnlineSlave(new LabelAtom("ci-2"));
         WorkflowJob p = r.jenkins.createProject(WorkflowJob.class, "stage-node-job");
-        p.setDefinition(new CpsFlowDefinition(jobScript,true));
+        p.setDefinition(new CpsFlowDefinition(jobScript, true));
         WorkflowRun b1 = r.assertBuildStatusSuccess(p.scheduleBuild2(0));
         assertFalse(b1.isBuilding());
         r.assertLogContains("hello", b1);
@@ -51,5 +64,20 @@ public class StageStepNodesTest {
         //check exec_node
         verifySplunkSearchResult("\"stages{}.children{}.exec_node\"=\"" + node.getNodeName() + "\"", startTime, 1);
         verifySplunkSearchResult("\"stages{}.children{}.exec_node\"=\"" + node1.getNodeName() + "\"", startTime, 1);
+    }
+
+    @Test
+    public void testFlattenStageResult() throws Exception {
+        long startTime = System.currentTimeMillis();
+        WorkflowJob p = r.jenkins.createProject(WorkflowJob.class, "nested-stage-job");
+        p.setDefinition(new CpsFlowDefinition(nestedStage, true));
+        WorkflowRun b1 = r.assertBuildStatusSuccess(p.scheduleBuild2(0));
+        assertFalse(b1.isBuilding());
+        r.assertLogContains("hello", b1);
+        assertTrue(b1.getDuration() > 0);
+        //check stage count
+        verifySplunkSearchResult("type=completed build_url=" + b1.getUrl() + "|spath output=stages path=\"stages{}\"" +
+                "| mvexpand stages" +
+                "| table stages", startTime, 4);
     }
 }

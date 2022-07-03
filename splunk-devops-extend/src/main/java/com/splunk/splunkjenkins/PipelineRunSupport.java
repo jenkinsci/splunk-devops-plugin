@@ -8,18 +8,21 @@ import hudson.model.Result;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.flow.FlowExecution;
 import org.jenkinsci.plugins.workflow.graphanalysis.ForkScanner;
-import org.jenkinsci.plugins.workflow.graphanalysis.LabelledChunkFinder;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.jenkinsci.plugins.workflow.pipelinegraphanalysis.StageChunkFinder;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
 @Extension
 public class PipelineRunSupport extends LoggingJobExtractor<WorkflowRun> {
+    private static final Logger LOG = Logger.getLogger(PipelineRunSupport.class.getName());
 
     @Override
     public Map<String, Object> extract(WorkflowRun workflowRun, boolean jobCompleted) {
@@ -28,14 +31,13 @@ public class PipelineRunSupport extends LoggingJobExtractor<WorkflowRun> {
             FlowExecution execution = workflowRun.getExecution();
             if (execution != null) {
                 WorkspaceChunkVisitor visitor = new WorkspaceChunkVisitor(workflowRun);
-                //LabelledChunkFinder to find stages and parallel branches
-                ForkScanner.visitSimpleChunks(execution.getCurrentHeads(), visitor, new LabelledChunkFinder());
-                Collection<StageNodeExt> nodes = visitor.getStages();
+                ForkScanner.visitSimpleChunks(execution.getCurrentHeads(), visitor, new StageChunkFinder());
+                Collection<StageNodeExt> stages = visitor.getStages();
+                LOG.log(Level.FINE, "found stages count", stages.size());
                 Map<String, String> execNodes = visitor.getWorkspaceNodes();
-                Map<String, String> parallelNodeStages = visitor.getParallelNodes();
-                if (!nodes.isEmpty()) {
-                    List<Map> labeledChunks = new ArrayList<Map>(nodes.size());
-                    for (StageNodeExt stageNodeExt : nodes) {
+                if (!stages.isEmpty()) {
+                    List<Map> labeledStages = new ArrayList<Map>(stages.size());
+                    for (StageNodeExt stageNodeExt : stages) {
                         Map<String, Object> stage = flowNodeToMap(stageNodeExt, execNodes);
                         List<Map<String, Object>> children = new ArrayList<>();
                         for (FlowNodeExt childNode : stageNodeExt.getStageFlowNodes()) {
@@ -43,13 +45,10 @@ public class PipelineRunSupport extends LoggingJobExtractor<WorkflowRun> {
                         }
                         if (!children.isEmpty()) {
                             stage.put("children", children);
-                            if (parallelNodeStages.containsKey(stageNodeExt.getId())) {
-                                stage.put("enclosing_stage", parallelNodeStages.get(stageNodeExt.getId()));
-                            }
                         }
-                        labeledChunks.add(stage);
+                        labeledStages.add(stage);
                     }
-                    info.put("stages", labeledChunks);
+                    info.put("stages", labeledStages);
                 }
             }
             SplunkTaskListenerFactory.removeCache(workflowRun);
@@ -77,7 +76,7 @@ public class PipelineRunSupport extends LoggingJobExtractor<WorkflowRun> {
         result.put("arguments", node.getParameterDescription());
         String execNodeName = node.getExecNode();
         if (StringUtils.isEmpty(execNodeName)) {
-            //lockup the workspace nodes
+            //lookup the workspace nodes
             execNodeName = execNodes.get(node.getId());
         }
         result.put("exec_node", execNodeName);
