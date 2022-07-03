@@ -12,8 +12,8 @@ import org.jenkinsci.plugins.workflow.graph.FlowStartNode;
 import org.jenkinsci.plugins.workflow.graphanalysis.ForkScanner;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -35,12 +35,12 @@ public class WorkspaceChunkVisitor extends ChunkVisitor {
     String enclosingStageId = null;
     String currentParallelNodeStartId = "";
 
-    public WorkspaceChunkVisitor(@Nonnull WorkflowRun run) {
+    public WorkspaceChunkVisitor(@NonNull WorkflowRun run) {
         super(run);
     }
 
     @Override
-    public void atomNode(@CheckForNull FlowNode before, @Nonnull FlowNode atomNode, @CheckForNull FlowNode after, @Nonnull ForkScanner scan) {
+    public void atomNode(@CheckForNull FlowNode before, @NonNull FlowNode atomNode, @CheckForNull FlowNode after, @NonNull ForkScanner scan) {
         //reverse-order, traverse from end node to start node
         try {
             recordExecNode(atomNode);
@@ -111,7 +111,7 @@ public class WorkspaceChunkVisitor extends ChunkVisitor {
      * @param scan Scanner
      */
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-    private void recordParallelNode(@Nonnull ForkScanner scan) {
+    private void recordParallelNode(@NonNull ForkScanner scan) {
         if (scan.getCurrentParallelStartNode() != null) {
             //store parallel node start id
             String nodeId = scan.getCurrentParallelStartNode().getId();

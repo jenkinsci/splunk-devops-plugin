@@ -14,7 +14,7 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Set;
 
 import static com.splunk.splunkjenkins.utils.LogEventHelper.parseFileSize;
@@ -35,7 +35,7 @@ public class SplunkLogFileStep extends Step {
     boolean publishFromSlave;
 
     @DataBoundConstructor
-    public SplunkLogFileStep(@Nonnull String includes) {
+    public SplunkLogFileStep(@NonNull String includes) {
         this.includes = includes;
     }
 
@@ -89,7 +89,7 @@ public class SplunkLogFileStep extends Step {
             return "sendSplunkFile";
         }
 
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "Send files to Splunk";

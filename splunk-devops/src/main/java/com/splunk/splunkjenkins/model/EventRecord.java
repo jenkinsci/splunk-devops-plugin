@@ -4,7 +4,7 @@ import com.splunk.splunkjenkins.SplunkJenkinsInstallation;
 import com.splunk.splunkjenkins.utils.LogEventHelper;
 import org.apache.commons.lang.StringUtils;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Locale;
@@ -57,7 +57,7 @@ public class EventRecord {
         this.time = time;
     }
 
-    @Nonnull
+    @NonNull
     public Object getMessage() {
         if (message instanceof SoftReference) {
             String text = (String) ((SoftReference) message).get();
@@ -106,7 +106,7 @@ public class EventRecord {
     /**
      * @return the event type
      */
-    @Nonnull
+    @NonNull
     public EventType getEventType() {
         return eventType;
     }
