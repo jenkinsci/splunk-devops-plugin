@@ -40,6 +40,7 @@ public class StageStepNodesTest {
             "            echo \"hello\"\n" +
             "            stage('build c'){\n" +
             "                echo \"hello\"\n" +
+            "                build job:'dummy-job', wait:false \n" +
             "            }\n" +
             "        }\n" +
             "    }\n" +
@@ -71,6 +72,8 @@ public class StageStepNodesTest {
         long startTime = System.currentTimeMillis();
         WorkflowJob p = r.jenkins.createProject(WorkflowJob.class, "nested-stage-job");
         p.setDefinition(new CpsFlowDefinition(nestedStage, true));
+        WorkflowJob dummy = r.jenkins.createProject(WorkflowJob.class, "dummy-job");
+        dummy.setDefinition(new CpsFlowDefinition("node{}", true));
         WorkflowRun b1 = r.assertBuildStatusSuccess(p.scheduleBuild2(0));
         assertFalse(b1.isBuilding());
         r.assertLogContains("hello", b1);
