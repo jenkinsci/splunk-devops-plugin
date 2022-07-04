@@ -1,5 +1,6 @@
 package com.splunk.splunkjenkins.utils;
 
+import com.splunk.splunkjenkins.BaseTest;
 import com.splunk.splunkjenkins.Constants;
 import com.splunk.splunkjenkins.model.AbstractTestResultAdapter;
 import com.splunk.splunkjenkins.model.JunitResultAdapter;
@@ -16,7 +17,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class TestCaseResultUtilsTest {
+public class TestCaseResultUtilsTest extends BaseTest {
     public void splitJunitTestCase(int total, int pageSize) throws Exception {
         TestResult result = new TestResult();
         File junitFile = File.createTempFile("junit", ".xml");
