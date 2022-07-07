@@ -27,7 +27,8 @@ public class Constants {
     public final static String QUEUE_WAITING_ITEM_NAME = "queue_item";
     public static final String JOB_EVENT_TAG_NAME = "job_event";
     public static final String JOB_EVENT_MONITOR = "job_monitor";
-    public static final String MASTER = "(master)";
+    // https://www.jenkins.io/doc/upgrade-guide/2.319/#built-in-node-name-and-label-migration
+    public static final String BUILT_IN_NODE = "(built-in)";
     public static final String BUILD_REPORT_ENV_TAG = "metadata";
     public static final String JENKINS_CONFIG_PREFIX = "jenkins://";
     public static final String JENKINS_SOURCE_SEP = "/";

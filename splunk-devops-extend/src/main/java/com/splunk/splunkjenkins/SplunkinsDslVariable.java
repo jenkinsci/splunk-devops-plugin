@@ -9,7 +9,7 @@ import org.jenkinsci.plugins.workflow.cps.CpsScript;
 import org.jenkinsci.plugins.workflow.cps.GlobalVariable;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.logging.Level;
@@ -19,15 +19,15 @@ import static com.splunk.splunkjenkins.utils.LogEventHelper.getBuildVariables;
 
 @Extension(optional = true)
 public class SplunkinsDslVariable extends GlobalVariable {
-    @Nonnull
+    @NonNull
     @Override
     public String getName() {
         return "splunkins";
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public Object getValue(@Nonnull CpsScript script) throws Exception {
+    public Object getValue(@NonNull CpsScript script) throws Exception {
         Run<?, ?> build = script.$build();
         if (build == null) {
             throw new IllegalStateException("cannot find associated build");

@@ -8,7 +8,7 @@ import hudson.model.Job;
 import hudson.model.Run;
 import jenkins.model.TransientActionFactory;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,9 +21,9 @@ public class RunActionFactory extends TransientActionFactory<Run> {
         return Run.class;
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public Collection<? extends Action> createFor(@Nonnull Run target) {
+    public Collection<? extends Action> createFor(@NonNull Run target) {
         Job job = target.getParent();
         LogEventHelper.UrlQueryBuilder builder=new LogEventHelper.UrlQueryBuilder()
                 .putIfAbsent("host", SplunkJenkinsInstallation.get().getMetadataHost())

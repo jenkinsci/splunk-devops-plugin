@@ -9,7 +9,7 @@ import hudson.model.Action;
 import hudson.model.BuildableItem;
 import jenkins.model.TransientActionFactory;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -21,9 +21,9 @@ public class BuildableItemActionFactory extends TransientActionFactory<Buildable
         return BuildableItem.class;
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public Collection<? extends Action> createFor(@Nonnull BuildableItem target) {
+    public Collection<? extends Action> createFor(@NonNull BuildableItem target) {
         String query = new LogEventHelper.UrlQueryBuilder()
                 .putIfAbsent("build_analysis_jenkinsmaster", SplunkJenkinsInstallation.get().getMetadataHost())
                 .putIfAbsent("build_analysis_job", target.getFullName()).build();

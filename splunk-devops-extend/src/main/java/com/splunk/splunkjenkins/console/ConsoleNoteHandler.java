@@ -1,5 +1,6 @@
 package com.splunk.splunkjenkins.console;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLEventReader;
@@ -53,6 +54,7 @@ public class ConsoleNoteHandler {
      * @see hudson.console.HyperlinkNote
      * @see org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApprovalNote
      */
+    @SuppressFBWarnings("SF_SWITCH_NO_DEFAULT")
     public void read(String xml) throws XMLStreamException {
         XMLEventReader reader = xmlInputFactory.createXMLEventReader(new StringReader(xml));
         while (reader.hasNext()) {

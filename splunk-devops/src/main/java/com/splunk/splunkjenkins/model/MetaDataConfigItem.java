@@ -8,7 +8,7 @@ import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashSet;
@@ -24,9 +24,9 @@ public class MetaDataConfigItem implements Describable<MetaDataConfigItem> {
     private static final String DISABLED_KEY = "disabled";
     private static final Map<String, String> CONFIG_ITEM_MAP = new ImmutableMap.Builder<String, String>().put("Index", "index")
             .put("Source Type", "sourcetype").put("Disabled", DISABLED_KEY).build();
-    @Nonnull
+    @NonNull
     private String dataSource;
-    @Nonnull
+    @NonNull
     private String keyName;
     //can only be null if enabled is false
     private String value;
@@ -35,7 +35,7 @@ public class MetaDataConfigItem implements Describable<MetaDataConfigItem> {
         return dataSource;
     }
 
-    public void setDataSource(@Nonnull String dataSource) {
+    public void setDataSource(@NonNull String dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -43,7 +43,7 @@ public class MetaDataConfigItem implements Describable<MetaDataConfigItem> {
         return keyName;
     }
 
-    public void setKeyName(@Nonnull String keyName) {
+    public void setKeyName(@NonNull String keyName) {
         this.keyName = keyName;
     }
 
@@ -93,7 +93,7 @@ public class MetaDataConfigItem implements Describable<MetaDataConfigItem> {
 
     @Override
     public Descriptor<MetaDataConfigItem> getDescriptor() {
-        return Jenkins.getInstance().getDescriptor(getClass());
+        return Jenkins.getInstance().getDescriptor(MetaDataConfigItem.class);
     }
 
     @Extension

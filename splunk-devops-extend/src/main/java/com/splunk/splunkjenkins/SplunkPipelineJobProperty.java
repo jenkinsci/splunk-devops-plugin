@@ -7,7 +7,7 @@ import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 
 @SuppressWarnings("rawtypes")
 public class SplunkPipelineJobProperty extends OptionalJobProperty<WorkflowJob> {

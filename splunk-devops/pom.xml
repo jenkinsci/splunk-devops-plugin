@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.splunk.splunkins</groupId>
         <artifactId>pom</artifactId>
-        <version>${revision}${changelist}</version>
+        <version>1.10.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>splunk-devops</artifactId>
@@ -37,7 +37,7 @@
         <developer>
             <id>fengxx</id>
             <name>Ted Xiao</name>
-            <email>txiao@splunk.com</email>
+            <email>xiao.xj@outlook.com</email>
         </developer>
     </developers>
 
@@ -106,6 +106,7 @@
                                 <exclude>org.apache.maven.doxia:doxia-sink-api</exclude>
                                 <exclude>org.apache.maven.doxia:doxia-logging-api</exclude>
                                 <exclude>org.apache.maven:maven-plugin-api</exclude>
+                                <exclude>org.apache.maven:maven-plugin</exclude>
                                 <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
                             </excludes>
                         </requireUpperBoundDeps>
@@ -122,14 +123,14 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>2.4.8</version>
+            <version>2.4.12</version>
             <scope>provided</scope> <!-- from jenkins-core -->
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>junit</artifactId>
-            <version>1.18</version>
-            <optional>true</optional><!-- from jenkins-core -->
+            <version>1.47</version>
+            <optional>true</optional><!-- from jenkins-core detached-plugins -->
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
@@ -137,14 +138,7 @@
             <version>1.14</version>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>mailer</artifactId>
-            <version>1.20</version>
-            <optional>true</optional>
-            <scope>test</scope>
-            <!--split from jenkins core-->
-        </dependency>
+
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>cucumber-testresult-plugin</artifactId>
@@ -160,7 +154,7 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>cobertura</artifactId>
-            <version>1.9.8</version>
+            <version>1.17</version>
             <optional>true</optional>
             <exclusions>
                 <exclusion>
@@ -171,17 +165,21 @@
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>scm-api</artifactId>
+            <version>2.4.1</version>
+            <optional>true</optional>
+            <scope>test</scope>
+            <!-- cobertura requires scm-api 2.4.1 or higher -->
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>jacoco</artifactId>
             <version>2.1.0</version>
             <optional>true</optional>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.maven</groupId>
-                    <artifactId>maven-project</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.maven</groupId>
-                    <artifactId>maven-artifact-manager</artifactId>
+                    <artifactId>*</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.codehaus.plexus</groupId>
@@ -195,12 +193,16 @@
                     <groupId>xml-apis</groupId>
                     <artifactId>xml-apis</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>script-security</artifactId>
-            <version>1.61</version>
+            <version>1118.vba21ca2e3286</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

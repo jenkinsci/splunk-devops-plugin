@@ -7,7 +7,7 @@ import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
 import org.jvnet.tiger_types.Types;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public abstract class AbstractTestResultAdapter<A extends AbstractTestResultActi
      * @param build jenkins build
      * @return all the test result added in the build
      */
-    @Nonnull
+    @NonNull
     public static List<TestResult> getTestResult(Run build) {
         return getTestResult(build, Collections.<String>emptyList());
     }
@@ -53,8 +53,8 @@ public abstract class AbstractTestResultAdapter<A extends AbstractTestResultActi
      * @param ignoredActions a list of test action class name
      * @return the test result filtered by the test action name
      */
-    @Nonnull
-    public static List<TestResult> getTestResult(Run build, @Nonnull List<String> ignoredActions) {
+    @NonNull
+    public static List<TestResult> getTestResult(Run build, @NonNull List<String> ignoredActions) {
         List<AbstractTestResultAdapter> adapters = ExtensionList.lookup(AbstractTestResultAdapter.class);
         List<TestResult> testResults = new ArrayList<>();
         for (AbstractTestResultAdapter adapter : adapters) {

@@ -47,13 +47,13 @@ public class LogFileCallable implements FilePath.FileCallable<Integer> {
                     continue;
                 }
                 if (sendFromSlave) {
-                    LOG.log(Level.INFO, "uploading from slave:" + path.getName());
+                    LOG.log(Level.INFO, "uploading from agent:" + path.getName());
                     eventCount += path.act(this);
                     LOG.log(Level.FINE, "sent in " + eventCount + " batches");
                 } else {
                     InputStream in = path.read();
                     try {
-                        LOG.log(Level.FINE, "uploading from master:" + path.getName());
+                        LOG.log(Level.FINE, "uploading from built-in node:" + path.getName());
                         eventCount += send(path.getRemote(), in);
                     } finally {
                         in.close();

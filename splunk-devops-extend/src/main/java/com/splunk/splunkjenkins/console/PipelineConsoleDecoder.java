@@ -5,7 +5,7 @@ import com.splunk.splunkjenkins.utils.PlainTextConsoleUtils;
 import hudson.console.ConsoleNote;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;

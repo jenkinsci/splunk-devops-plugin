@@ -11,7 +11,7 @@ import hudson.tasks.Publisher;
 import jenkins.tasks.SimpleBuildStep;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,8 +48,8 @@ public class SplunkArtifactNotifier extends Notifier implements SimpleBuildStep 
     }
 
     @Override
-    public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace,
-                           @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
+    public void perform(@NonNull Run<?, ?> build, @NonNull FilePath workspace,
+                           @NonNull Launcher launcher, @NonNull TaskListener listener) throws InterruptedException, IOException {
         Map<String, String> envVars = new HashMap<>();
         try {
             envVars = build.getEnvironment(listener);

@@ -7,7 +7,7 @@ import hudson.model.HealthReportingAction;
 import hudson.model.Run;
 import org.jvnet.tiger_types.Types;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -41,7 +41,7 @@ public abstract class CoverageMetricsAdapter<M extends HealthReportingAction> im
         return getAction(build) != null;
     }
 
-    @Nonnull
+    @NonNull
     public static Map<Metric, Integer> getMetrics(Run build) {
         List<CoverageMetricsAdapter> adapters = ExtensionList.lookup(CoverageMetricsAdapter.class);
         for (CoverageMetricsAdapter adapter : adapters) {

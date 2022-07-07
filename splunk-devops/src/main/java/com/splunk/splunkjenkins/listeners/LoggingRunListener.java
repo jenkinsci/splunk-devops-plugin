@@ -17,7 +17,7 @@ import jenkins.model.CauseOfInterruption;
 import jenkins.model.InterruptedBuildAction;
 import org.apache.commons.lang.StringUtils;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,7 +52,7 @@ public class LoggingRunListener extends RunListener<Run> {
     }
 
     @Override
-    public void onCompleted(Run run, @Nonnull TaskListener listener) {
+    public void onCompleted(Run run, @NonNull TaskListener listener) {
         if (SplunkJenkinsInstallation.get().isEventDisabled(BUILD_EVENT) ||
                 SplunkJenkinsInstallation.get().isJobIgnored(run.getUrl())) {
             return;
@@ -156,7 +156,7 @@ public class LoggingRunListener extends RunListener<Run> {
             }
             nodeName = executor.getOwner().getName();
             if (StringUtils.isEmpty(nodeName)) {
-                nodeName = Constants.MASTER;
+                nodeName = Constants.BUILT_IN_NODE;
             }
         } else if (run instanceof AbstractBuild) {
             nodeName = ((AbstractBuild) run).getBuiltOnStr();

@@ -5,7 +5,7 @@ import hudson.model.User;
 import jenkins.security.SecurityListener;
 import org.acegisecurity.userdetails.UserDetails;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import static com.splunk.splunkjenkins.utils.LogEventHelper.logUserAction;
 
@@ -15,27 +15,27 @@ import static com.splunk.splunkjenkins.utils.LogEventHelper.logUserAction;
 @Extension
 public class UserSecurityListener extends SecurityListener {
     @Override
-    protected void authenticated(@Nonnull UserDetails details) {
+    protected void authenticated(@NonNull UserDetails details) {
         logUserAction(details.getUsername(), "authenticated");
     }
 
     @Override
-    protected void failedToAuthenticate(@Nonnull String username) {
+    protected void failedToAuthenticate(@NonNull String username) {
         logUserAction(getFullName(username), Messages.audit_user_fail_auth());
     }
 
     @Override
-    protected void loggedIn(@Nonnull String username) {
+    protected void loggedIn(@NonNull String username) {
         logUserAction(getFullName(username), Messages.audit_user_login());
     }
 
     @Override
-    protected void failedToLogIn(@Nonnull String username) {
+    protected void failedToLogIn(@NonNull String username) {
         //covered by failedToAuthenticate
     }
 
     @Override
-    protected void loggedOut(@Nonnull String username) {
+    protected void loggedOut(@NonNull String username) {
         logUserAction(getFullName(username), Messages.audit_user_logout());
     }
 
