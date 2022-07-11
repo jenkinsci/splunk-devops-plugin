@@ -11,8 +11,6 @@ import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
-import java.util.Map;
-
 public class CustomLoggerItem implements Describable<CustomLoggerItem> {
     private static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(CustomLoggerItem.class.getName());
 
@@ -73,8 +71,8 @@ public class CustomLoggerItem implements Describable<CustomLoggerItem> {
         public static ListBoxModel doFillCustomLoggerNameItems() {
             ListBoxModel items = new ListBoxModel();
 
-            for (Map.Entry<String, LogRecorder> e : logRecorderManager.logRecorders.entrySet()) {
-                items.add(e.getKey(), e.getValue().getDisplayName());
+            for (LogRecorder r : logRecorderManager.getRecorders()) {
+                items.add(r.getName(), r.getDisplayName());
             }
             return items;
         }

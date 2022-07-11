@@ -93,8 +93,8 @@ public class JdkSplunkLogHandler extends Handler {
             if (clConfig != null) {
                 for (CustomLoggerItem clItem : clConfig.getCustomLoggers()) {
                     LogRecorder logRecorder = clItem.getLogRecorder();
-                    if (logRecorder != null && logRecorder.targets != null) {
-                        for (LogRecorder.Target target : logRecorder.targets) {
+                    if (logRecorder != null && logRecorder.getLoggers() != null) {
+                        for (LogRecorder.Target target : logRecorder.getLoggers()) {
                             if (Boolean.TRUE.equals(target.matches(record))) {
                                 return true;
                             }
