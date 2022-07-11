@@ -6,7 +6,7 @@ import jenkins.util.JenkinsJVM;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.plugins.workflow.log.TaskListenerDecorator;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
@@ -24,9 +24,9 @@ public class SplunkConsoleTaskListenerDecorator extends TaskListenerDecorator {
         this.source = run.getUrl() + "console";
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public OutputStream decorate(@Nonnull OutputStream outputStream) throws IOException {
+    public OutputStream decorate(@NonNull OutputStream outputStream) throws IOException {
         if (!JenkinsJVM.isJenkinsJVM()) {
             if (remoteSplunkinsConfig != null) {
                 RemoteUtils.initSplunkConfigOnAgent(remoteSplunkinsConfig);

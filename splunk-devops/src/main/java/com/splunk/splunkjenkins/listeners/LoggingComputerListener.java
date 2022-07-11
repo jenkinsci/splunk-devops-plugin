@@ -8,8 +8,8 @@ import hudson.model.TaskListener;
 import hudson.slaves.ComputerListener;
 import hudson.slaves.OfflineCause;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.util.Map;
 
@@ -27,7 +27,7 @@ public class LoggingComputerListener extends ComputerListener {
     }
 
     @Override
-    public void onOffline(@Nonnull Computer c, @CheckForNull OfflineCause cause) {
+    public void onOffline(@NonNull Computer c, @CheckForNull OfflineCause cause) {
         updateStatus(c, "Offline");
     }
 

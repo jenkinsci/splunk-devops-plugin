@@ -43,7 +43,7 @@ public class LoggingQueueListenerTest extends BaseTest {
         assertEquals(1, items.length);
         queueId = items[0].getId();
         // job waits for start since there is no node have the label
-        Thread.sleep(TimeUnit.SECONDS.toMillis(3));
+        Thread.sleep(TimeUnit.SECONDS.toMillis(15));
         j.jenkins.getQueue().clear();
         splQuery = "event_tag=queue queue_id=" + queueId + " type=dequeue_buildable "
                 + "buildable_time>3";

@@ -22,7 +22,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Util;
-import hudson.console.ConsoleNote;
 import hudson.model.*;
 import hudson.model.Queue;
 import hudson.model.queue.WorkUnit;
@@ -30,7 +29,6 @@ import hudson.node_monitors.NodeMonitor;
 import hudson.tasks.Publisher;
 import hudson.triggers.SCMTrigger;
 import hudson.triggers.TimerTrigger;
-import hudson.util.ByteArrayOutputStream2;
 import hudson.util.DescribableList;
 import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
@@ -53,7 +51,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -409,7 +406,7 @@ public class LogEventHelper {
             return "N/A";
         }
         if (computer instanceof Jenkins.MasterComputer) {
-            return Constants.MASTER;
+            return Constants.BUILT_IN_NODE;
         } else {
             return computer.getName();
         }

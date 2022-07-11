@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.startsWith;
 
 public class LabelMarkupText extends MarkupText {
     private static final Boolean isDisabled = Boolean.getBoolean(LogEventHelper.class.getName() + ".disableLabelMarkup");
@@ -69,7 +70,7 @@ public class LabelMarkupText extends MarkupText {
                     // BlockEndNode or BlockStartNode
                     encloseLabel = null;
                     String label = handler.getLabel();
-                    if (label.startsWith(PARALLEL_BRANCH_LABEL)) {
+                    if (startsWith(label, PARALLEL_BRANCH_LABEL)) {
                         encloseLabels.put(nodeId, label.substring(PARALLEL_BRANCH_LABEL.length()));
                     }
                 } else {

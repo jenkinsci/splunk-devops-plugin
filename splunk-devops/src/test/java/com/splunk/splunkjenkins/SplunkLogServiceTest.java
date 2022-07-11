@@ -14,9 +14,6 @@ import org.junit.*;
 import static com.splunk.splunkjenkins.SplunkConfigUtil.verifySplunkSearchResult;
 import static org.junit.Assert.*;
 
-import javax.annotation.concurrent.NotThreadSafe;
-
-@NotThreadSafe
 public class SplunkLogServiceTest extends BaseTest {
     private static final Logger LOG = Logger.getLogger(SplunkLogServiceTest.class.getName());
     private static final int BATCH_COUNT = 1000;
