@@ -58,4 +58,4 @@ Contributing to the plugin
 
 Documentation
 ----
-See the [documentation](doc/USAGE.md)
+See the [documentation](doc/splunk-devops-usage.md)

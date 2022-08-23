@@ -143,7 +143,7 @@ Example: `java -Dsplunkins.buffer=4096 -jar jenkins.war`
 |-------------|-------------|-------------|
 |com.splunk.splunkjenkins.JdkSplunkLogHandler.level|INFO|log message levels lower than this will not be send to splunk|
 |splunkins.buffer|4096|console log buffer size|
-|splunkins.consoleLogFilterPattern|(empty)| regular expression for 'interesting' build. if it is set, only send console log to splunk for the job whose build url matches the pattern|
+|splunkins.allowConsoleLogPattern|(empty)| regular expression for 'interesting' build. if it is set, only send to splunk for the job whose build url matches the pattern|
 |splunkins.debugLogBatchSize|128|batch size for sending verbose level (FINE,FINER,FINEST) log record|
 |splunkins.enableRemoteTaskListenerDecorator|true|whether to capture remote TaskListener|
 |splunkins.ignoreConfigChangePattern|(?:queue&#124;nodeMonitors&#124;UpdateCenter&#124;global-build-stats).xml&#124;/(?:fingerprint&#124;builds&#124;config-history)/.*?xml|regular expression for ignoring config file changes|
