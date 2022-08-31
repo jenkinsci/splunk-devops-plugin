@@ -1,5 +1,5 @@
 <?jelly escape-by-default='true'?>
 <div>
-    Splunk plugin for Jenkins provides deep insights into your Jenkins master and slave infrastructure, job and
+    Splunk plugin for Jenkins provides deep insights into your Jenkins controller and agent infrastructure, job and
 build details such as console logs, status, artifacts, and an incredibly efficient way to analyze test results.
 </div>
