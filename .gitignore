@@ -6,7 +6,8 @@ work
 *~
 
 # IntelliJ project files
-.idea/
+.idea/*
+!.idea/codeStyles/
 *.iml
 
 # Eclipse IDE project files
@@ -26,3 +27,6 @@ debug.log.lck
 pom.xml.versionsBackup
 pom.xml.releaseBackup
 dependency-reduced-pom.xml
+
+# VS code files
+.vscode/

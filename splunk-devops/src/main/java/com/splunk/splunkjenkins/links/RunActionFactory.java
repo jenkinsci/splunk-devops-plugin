@@ -25,16 +25,16 @@ public class RunActionFactory extends TransientActionFactory<Run> {
     @Override
     public Collection<? extends Action> createFor(@NonNull Run target) {
         Job job = target.getParent();
-        LogEventHelper.UrlQueryBuilder builder=new LogEventHelper.UrlQueryBuilder()
+        LogEventHelper.UrlQueryBuilder builder = new LogEventHelper.UrlQueryBuilder()
                 .putIfAbsent("host", SplunkJenkinsInstallation.get().getMetadataHost())
                 .putIfAbsent("job", job.getFullName())
                 .putIfAbsent("build", target.getNumber() + "");
         File junitFile = new File(target.getRootDir(), "junitResult.xml");
         if (junitFile.exists() || job.getClass().getName().startsWith("hudson.maven.")) {
-            String query =builder.build();
+            String query = builder.build();
             return Collections.singleton(new LinkSplunkAction("test_analysis", query, "Splunk"));
         }
-        String query =builder.putIfAbsent("type","build").build();
-        return Collections.singleton(new LinkSplunkAction("build_analysis", query, "Splunk"));
+        String query = builder.putIfAbsent("type", "build").build();
+        return Collections.singleton(new LinkSplunkAction("build", query, "Splunk"));
     }
 }
