@@ -46,9 +46,8 @@ public class ConsoleNoteHandler {
     }
 
     /**
-     * parse first <a> </a> or <span> </span>
-     * 
-     * @param xml the xml
+     * parse first <a><a/> or <span></span>
+     * @param xml
      * @throws SAXException
      * @throws XMLStreamException
      * @see org.jenkinsci.plugins.workflow.job.console.NewNodeConsoleNote
@@ -56,7 +55,7 @@ public class ConsoleNoteHandler {
      * @see org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApprovalNote
      */
     @SuppressFBWarnings("SF_SWITCH_NO_DEFAULT")
-    public void read(String xml) throws XMLStreamException, SAXException {
+    public void read(String xml) throws XMLStreamException {
         XMLEventReader reader = xmlInputFactory.createXMLEventReader(new StringReader(xml));
         while (reader.hasNext()) {
             XMLEvent nextEvent = reader.nextEvent();
@@ -67,7 +66,7 @@ public class ConsoleNoteHandler {
                     Iterator<Attribute> attrs = startElement.getAttributes();
                     while (attrs.hasNext()) {
                         Attribute attr = attrs.next();
-                        String attrName = attr.getName().getLocalPart();
+                        String attrName=attr.getName().getLocalPart();
                         switch (attrName) {
                             case "href":
                                 href = attr.getValue();
