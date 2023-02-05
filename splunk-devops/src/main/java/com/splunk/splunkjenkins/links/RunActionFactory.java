@@ -35,6 +35,6 @@ public class RunActionFactory extends TransientActionFactory<Run> {
             return Collections.singleton(new LinkSplunkAction("test_analysis", query, "Splunk"));
         }
         String query =builder.putIfAbsent("type","build").build();
-        return Collections.singleton(new LinkSplunkAction("build_analysis", query, "Splunk"));
+        return Collections.singleton(new LinkSplunkAction("build", query, "Splunk"));
     }
 }
