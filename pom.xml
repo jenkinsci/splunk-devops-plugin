@@ -88,13 +88,7 @@
                 <enabled>false</enabled>
             </snapshots>
         </pluginRepository>
-        <pluginRepository>
-            <id>splunk-artifactory</id>
-            <name>Splunk Releases</name>
-            <url>https://splunk.jfrog.io/splunk/ext-releases-local</url>
-        </pluginRepository>
     </pluginRepositories>
-
     <dependencies>
         <dependency>
             <groupId>com.splunk</groupId>
@@ -102,8 +96,8 @@
             <version>1.6.5.0</version>
             <scope>test</scope>            <!--only used to setup token and execute search-->
         </dependency>
-    </dependencies>
 
+    </dependencies>
     <profiles>
         <profile>
             <!--to use this profile, pass mvn -Plocal -Drepos.url=xx deploy-->
