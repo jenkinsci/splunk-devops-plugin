@@ -127,9 +127,8 @@
         <profile>
             <id>coverage</id>
             <activation>
-                <property>
-                    <name>env.BUILD_NUMBER</name>
-                </property>
+                <!-- cobertura-maven-plugin doesn't support jdk11 yet -->
+                <activeByDefault>false</activeByDefault>
             </activation>
             <build>
                 <plugins>
