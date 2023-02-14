@@ -1,3 +1,5 @@
+### 1.10.1 (July 11, 2022) 
+- Add CustomLoggersConfig global configuration that allows for specificying custom loggers to always send to Splunk regardless of log level, thanks to [Pierson Yieh](https://github.com/pyieh)
 ### 1.10.0 (July 4, 2022)
 - SECURITY-2128 plugin logs unmasked credentials, thanks to [Pierson Yieh](https://github.com/pyieh)
 - JENKINS-68775 pipeline build step is considered a stage in splunk plugin, thanks to [Guilherme Mota](https://github.com/guilhermemotadock)

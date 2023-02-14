@@ -83,6 +83,8 @@ public class ConsoleNoteHandler {
                             case "label":
                                 label = attr.getValue();
                                 break;
+                            default:
+                                break;
                         }
                     }
                     break;

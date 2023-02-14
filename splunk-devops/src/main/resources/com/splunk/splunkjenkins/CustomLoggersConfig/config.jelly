@@ -1,0 +1,11 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <f:section title="Splunk Custom Loggers Configuration">
+        <f:entry title="Custom Log Recorders to Send to Splunk">
+            <f:repeatable field="customLoggers" minimum="0" default="">
+                <st:include page="config.jelly" class="${descriptor.clazz}" />
+            </f:repeatable>
+        </f:entry>
+    </f:section>
+</j:jelly>
