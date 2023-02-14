@@ -6,6 +6,7 @@ import hudson.model.Action;
 
 import com.splunk.splunkjenkins.Messages;
 import jenkins.model.Jenkins;
+import org.apache.commons.lang.StringUtils;
 
 public class LinkSplunkAction implements Action {
     String query;
@@ -39,6 +40,10 @@ public class LinkSplunkAction implements Action {
     @Override
     public String getUrlName() {
         SplunkJenkinsInstallation instance = SplunkJenkinsInstallation.get();
-        return instance.getAppUrlOrHelp() + page + "?" + query;
+        if (StringUtils.isNotEmpty(query)) {
+            return instance.getAppUrlOrHelp() + page + "?" + query;
+        } else {
+            return instance.getAppUrlOrHelp() + page;
+        }
     }
 }
