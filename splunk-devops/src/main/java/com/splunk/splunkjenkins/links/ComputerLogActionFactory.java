@@ -6,7 +6,6 @@ import hudson.Extension;
 import hudson.model.Action;
 import hudson.model.Computer;
 import hudson.model.TransientComputerActionFactory;
-import jnr.ffi.annotations.Encoding;
 
 import java.util.Collections;
 import java.util.Collection;
