@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import com.splunk.splunkjenkins.SplunkJenkinsInstallation;
 import com.splunk.splunkjenkins.model.EventRecord;
 import com.splunk.splunkjenkins.model.EventType;
+import jenkins.util.SystemProperties;
 import shaded.splk.org.apache.http.HttpResponse;
 import shaded.splk.org.apache.http.client.HttpClient;
 import shaded.splk.org.apache.http.client.config.CookieSpecs;
@@ -42,7 +43,7 @@ import static com.splunk.splunkjenkins.model.EventType.BATCH_JSON;
 
 public class SplunkLogService {
     public static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(SplunkLogService.class.getName());
-    private static final boolean VERIFY_SSL = Boolean.getBoolean("splunkins.verifySSL");
+    private static final boolean VERIFY_SSL = SystemProperties.getBoolean("splunkins.verifySSL");
     private final static int SOCKET_TIMEOUT = 3;
     private final static int QUEUE_SIZE = Integer.getInteger(SplunkLogService.class.getName() + ".queueSize", 1 << 17);
     private final static long KEEP_ALIVE_TIME_MINUTES = 2;
