@@ -2,6 +2,7 @@ package com.splunk.splunkjenkins;
 
 import com.splunk.splunkjenkins.model.EventType;
 import com.splunk.splunkjenkins.model.MetaDataConfigItem;
+import com.splunk.splunkjenkins.utils.CustomSSLConnectionSocketFactory;
 import com.splunk.splunkjenkins.utils.SplunkLogService;
 import groovy.lang.GroovyCodeSource;
 import hudson.Extension;
@@ -26,27 +27,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.net.*;
+import java.security.cert.CertificateException;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import static com.splunk.splunkjenkins.Constants.*;
-import static com.splunk.splunkjenkins.utils.LogEventHelper.getDefaultDslScript;
-import static com.splunk.splunkjenkins.utils.LogEventHelper.nonEmpty;
-import static com.splunk.splunkjenkins.utils.LogEventHelper.validateGroovyScript;
-import static com.splunk.splunkjenkins.utils.LogEventHelper.verifyHttpInput;
+import static com.splunk.splunkjenkins.utils.LogEventHelper.*;
 import static groovy.lang.GroovyShell.DEFAULT_CODE_BASE;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static org.apache.commons.lang.StringUtils.isEmpty;
@@ -80,6 +70,8 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
     private String metadataSource;
     private String ignoredJobs;
     private Boolean globalPipelineFilter;
+    private Boolean verifyCertificate;
+    private String customCA;
 
     //below are all transient properties
     public transient Properties metaDataProperties = new Properties();
@@ -166,6 +158,7 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
         this.metadataItemSet = null; // otherwise bindJSON will never clear it once set
         boolean previousState = this.enabled;
+        String previousCAConfig = this.customCA + "|" + this.verifyCertificate;
         req.bindJSON(this, formData);
         if (this.metadataItemSet == null) {
             this.metaDataConfig = "";
@@ -178,6 +171,14 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         }
         updateCache();
         save();
+        String currentCAConfig = this.customCA + "|" + this.verifyCertificate;
+        // updated ca cert or tls verify flag
+        if (this.useSSL && this.enabled && !currentCAConfig.endsWith(previousCAConfig)) {
+            LOG.warning("tls config changed, need rebuild connection pool");
+            this.enabled = false;
+            SplunkLogService.getInstance().rebuild(this.verifyCertificate, this.customCA);
+            this.enabled = true;
+        }
         if (previousState && !this.enabled) {
             //switch from enable to disable
             SplunkLogService.getInstance().stopWorker();
@@ -223,7 +224,9 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
     @RequirePOST
     public FormValidation doTestHttpInput(@QueryParameter String host, @QueryParameter int port,
                                           @QueryParameter String token, @QueryParameter boolean useSSL,
-                                          @QueryParameter String metaDataConfig) {
+                                          @QueryParameter String metaDataConfig, @QueryParameter boolean verifyCertificate,
+                                          @QueryParameter String customCA
+    ) {
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
         //create new instance to avoid pollution global config
         SplunkJenkinsInstallation config = new SplunkJenkinsInstallation(false);
@@ -233,6 +236,8 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         config.useSSL = useSSL;
         config.metaDataConfig = metaDataConfig;
         config.enabled = true;
+        config.verifyCertificate = verifyCertificate;
+        config.customCA = customCA;
         config.updateCache();
         if (!config.isValid()) {
             return FormValidation.error(Messages.InvalidHostOrToken());
@@ -264,6 +269,18 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
             Pattern.compile(value);
         } catch (PatternSyntaxException ex) {
             return FormValidation.errorWithMarkup(Messages.InvalidPattern());
+        }
+        return FormValidation.ok();
+    }
+
+    @RequirePOST
+    public FormValidation doCheckCustomCA(@QueryParameter("value") String value) {
+        if (StringUtils.isNotBlank(value)) {
+            try {
+                CustomSSLConnectionSocketFactory.textToX509Cert(value);
+            } catch (CertificateException e) {
+                return FormValidation.error("can not parse certificate");
+            }
         }
         return FormValidation.ok();
     }
@@ -534,6 +551,8 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         map.put("retriesOnError", retriesOnError);
         map.put("metadataHost", metadataHost);
         map.put("metadataSource", metadataSource);
+        map.put("verifyCertificate", verifyCertificate);
+        map.put("customCA", customCA);
         return map;
     }
 
@@ -645,6 +664,10 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         if (this.globalPipelineFilter == null) {
             this.globalPipelineFilter = true;
         }
+        if (this.verifyCertificate == null) {
+            // previous version doesn't have such field
+            this.verifyCertificate = Boolean.getBoolean("splunkins.verifySSL");
+        }
     }
 
     public String getIgnoredJobs() {
@@ -665,5 +688,25 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
 
     public boolean isPipelineFilterEnabled() {
         return Boolean.TRUE.equals(globalPipelineFilter);
+    }
+
+    public Boolean getVerifyCertificate() {
+        return verifyCertificate;
+    }
+
+    public boolean isTlsVerify() {
+        return Boolean.TRUE.equals(verifyCertificate);
+    }
+
+    public void setVerifyCertificate(Boolean verifyCertificate) {
+        this.verifyCertificate = verifyCertificate;
+    }
+
+    public String getCustomCA() {
+        return customCA;
+    }
+
+    public void setCustomCA(String customCA) {
+        this.customCA = customCA;
     }
 }
