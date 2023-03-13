@@ -24,6 +24,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.logging.Level;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import static com.splunk.splunkjenkins.utils.MultipleHostResolver.NAME_DELIMITER;
 
@@ -81,7 +82,7 @@ public class CustomSSLConnectionSocketFactory extends SSLConnectionSocketFactory
     }
 
     public static X509Certificate textToX509Cert(String permCert) throws CertificateException {
-        X509Certificate certificate = (X509Certificate) CertificateFactory.getInstance("X509").generateCertificate(new ByteArrayInputStream(permCert.getBytes()));
+        X509Certificate certificate = (X509Certificate) CertificateFactory.getInstance("X509").generateCertificate(new ByteArrayInputStream(permCert.getBytes(UTF_8)));
         return certificate;
     }
 
