@@ -1,6 +1,7 @@
 package com.splunk.splunkjenkins.console;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang.StringUtils;
 import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLEventReader;
@@ -56,6 +57,13 @@ public class ConsoleNoteHandler {
      */
     @SuppressFBWarnings("SF_SWITCH_NO_DEFAULT")
     public void read(String xml) throws XMLStreamException {
+        // fix Maven notes which add invalid markup
+        // https://github.com/jenkinsci/jenkins/blob/c3ebd9dc706897c281036671eed6851390f85ade/core/src/main/java/hudson/tasks/_maven/MavenMojoNote.java#L50
+        xml = StringUtils.replace(xml, "<b class=maven-mojo>", "<b class=\"maven-mojo\">");
+        // https://github.com/jenkinsci/jenkins/blob/c3ebd9dc706897c281036671eed6851390f85ade/core/src/main/java/hudson/tasks/_maven/MavenWarningNote.java#L47
+        xml = StringUtils.replace(xml, "<span class=warning-inline>", "<span class=\"warning-inline\">");
+        // https://github.com/jenkinsci/jenkins/blob/c3ebd9dc706897c281036671eed6851390f85ade/core/src/main/java/hudson/tasks/_maven/MavenErrorNote.java#L45
+        xml = StringUtils.replace(xml, "<span class=error-inline>", "<span class=\"error-inline\">");
         XMLEventReader reader = xmlInputFactory.createXMLEventReader(new StringReader(xml));
         while (reader.hasNext()) {
             XMLEvent nextEvent = reader.nextEvent();
