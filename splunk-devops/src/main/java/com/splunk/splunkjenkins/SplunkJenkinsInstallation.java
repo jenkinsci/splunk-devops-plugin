@@ -95,14 +95,19 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
 
     public SplunkJenkinsInstallation(boolean useConfigFile) {
         if (useConfigFile) {
-            super.load();
-            migrate();
-            //load default metadata
-            try (InputStream metaInput = this.getClass().getClassLoader().getResourceAsStream("metadata.properties")) {
-                defaultMetaData = IOUtils.toString(metaInput);
-            } catch (IOException e) {
-                //ignore
-            }
+            load();
+        }
+    }
+
+    @Override
+    public synchronized final void load() {
+        super.load();
+        migrate();
+        //load default metadata
+        try (InputStream metaInput = this.getClass().getClassLoader().getResourceAsStream("metadata.properties")) {
+            defaultMetaData = IOUtils.toString(metaInput);
+        } catch (IOException e) {
+            //ignore
         }
     }
 
