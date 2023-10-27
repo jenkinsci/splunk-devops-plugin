@@ -94,8 +94,9 @@ public class LabelMarkupText extends MarkupText {
     }
 
     public void write(OutputStream out) throws IOException {
-        if (isNotEmpty(annotation)) {
-            out.write(annotation.getBytes(UTF_8));
+        String ann = annotation;
+        if (isNotEmpty(ann)) {
+            out.write(ann.getBytes(UTF_8));
             out.write(' ');
             //clear annotation
             annotation = null;
@@ -103,8 +104,9 @@ public class LabelMarkupText extends MarkupText {
     }
 
     public void writePreviousLabel(OutputStream out) throws IOException {
-        if (isNotEmpty(encloseLabel)) {
-            out.write(encloseLabel.getBytes(UTF_8));
+        String label = encloseLabel;
+        if (isNotEmpty(label)) {
+            out.write(label.getBytes(UTF_8));
             out.write(' ');
         }
     }
