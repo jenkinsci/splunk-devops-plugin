@@ -1,14 +1,14 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler"
          xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-    <table>
+    <table class="splunk-meta-config-table">
         <f:entry title="Data Source" field="dataSource">
             <f:select/>
         </f:entry>
         <f:entry title="Config item" field="keyName">
-            <f:select onchange="check_datasource_key(this)"/>
+            <f:select clazz="splunk-meta-config-item" />
         </f:entry>
-        <tr style="${instance.getCssDisplay()}">
+        <tr style="${instance.getCssDisplay()}" class="splunk-meta-config-value" >
             <td class="setting-leftspace">
                 <st:nbsp/>
             </td>
@@ -32,29 +32,4 @@
             </div>
         </f:entry>
     </table>
-    <st:once>
-        <script>
-function check_datasource_key(item) {
-    var val = item.value
-    var tableRow = item.parentNode.parentNode.nextSibling;
-    var validateRow
-    while (tableRow != null ) {
-        var className=tableRow.getAttribute("class")
-        if (className==null) {
-            break;
-        }
-        tableRow = tableRow.nextSibling
-    }
-    if (val == "disabled") {
-        tableRow.style.display = "none"
-        tableRow.nextSibling.style.display = "none"
-    } else {
-        tableRow.style.display = ""
-        tableRow.nextSibling.style.display = "";
-    }
-}
-
-
-        </script>
-    </st:once>
 </j:jelly>

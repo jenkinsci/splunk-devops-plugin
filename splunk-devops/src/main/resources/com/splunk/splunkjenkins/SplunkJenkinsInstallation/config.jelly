@@ -72,4 +72,5 @@
         </f:advanced>
 
     </f:section>
+    <st:adjunct includes="com.splunk.splunkjenkins.SplunkJenkinsInstallation.lib"/>
 </j:jelly>
