@@ -44,19 +44,16 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.gmaven</groupId>
-                <artifactId>gmaven-plugin</artifactId>
-                <version>1.4</version>
-                <configuration>
-                    <providerSelection>1.8</providerSelection>
-                </configuration>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>3.0.2</version>
                 <executions>
                     <execution>
                         <goals>
                             <goal>generateStubs</goal>
                             <goal>compile</goal>
                             <goal>generateTestStubs</goal>
-                            <goal>testCompile</goal>
+                            <goal>compileTests</goal>
                         </goals>
                     </execution>
                 </executions>
