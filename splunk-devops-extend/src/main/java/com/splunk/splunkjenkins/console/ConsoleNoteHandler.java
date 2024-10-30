@@ -1,23 +1,12 @@
 package com.splunk.splunkjenkins.console;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.xml.sax.SAXException;
-
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
-import java.io.StringReader;
-import java.util.Iterator;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Attributes;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 public class ConsoleNoteHandler {
-    private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-
-    static {
-        xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
-    }
 
     private String href;
     private String nodeId;
@@ -46,48 +35,42 @@ public class ConsoleNoteHandler {
     }
 
     /**
-     * parse first <a><a/> or <span></span>
-     * @param xml
-     * @throws SAXException
-     * @throws XMLStreamException
+     * parse first html tag <a><a/> or <span></span> with nodeId attribute
+     *
+     * @param tag
      * @see org.jenkinsci.plugins.workflow.job.console.NewNodeConsoleNote
      * @see hudson.console.HyperlinkNote
      * @see org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApprovalNote
      */
     @SuppressFBWarnings("SF_SWITCH_NO_DEFAULT")
-    public void read(String xml) throws XMLStreamException {
-        XMLEventReader reader = xmlInputFactory.createXMLEventReader(new StringReader(xml));
-        while (reader.hasNext()) {
-            XMLEvent nextEvent = reader.nextEvent();
-            if (nextEvent.isStartElement()) {
-                StartElement startElement = nextEvent.asStartElement();
-                String localParts = startElement.getName().getLocalPart();
-                if ("a".equals(localParts) || "span".equals(localParts)) {
-                    Iterator<Attribute> attrs = startElement.getAttributes();
-                    while (attrs.hasNext()) {
-                        Attribute attr = attrs.next();
-                        String attrName=attr.getName().getLocalPart();
-                        switch (attrName) {
-                            case "href":
-                                href = attr.getValue();
-                                break;
-                            case "nodeId":
-                                nodeId = attr.getValue();
-                                break;
-                            case "startId":
-                                startId = attr.getValue();
-                                break;
-                            case "enclosingId":
-                                enclosingId = attr.getValue();
-                                break;
-                            case "label":
-                                label = attr.getValue();
-                                break;
-                        }
-                    }
-                    break;
-                }
-            }
+    public void read(String tag) {
+        Document doc = Jsoup.parse(tag);
+        Element nodeEle = doc.getElementsByTag("a").first();
+        if (nodeEle == null) {
+            nodeEle = doc.getElementsByTag("span").first();
+        }
+        if (nodeEle == null) {
+            return;
+        }
+        if (nodeEle.attributesSize() == 0) {
+            return;
+        }
+        Attributes attrs = nodeEle.attributes();
+        href = getAttribute(attrs, "href");
+        nodeId = getAttribute(attrs, "nodeid");
+        startId = getAttribute(attrs, "startId");
+        enclosingId = getAttribute(attrs, "enclosingId");
+        label = getAttribute(attrs, "label");
+    }
+
+
+    private String getAttribute(Attributes attrs, String attrKey) {
+        String key = attrKey.toLowerCase();
+        // In the HTML syntax, attribute names may be written with any mix of lower- and uppercase letters that, when converted to all-lowercase, matches the attribute's name; attribute names are case-insensitive.
+        if (attrs.hasKey(key)) {
+            return attrs.get(key);
+        } else {
+            return null;
         }
     }
 }
