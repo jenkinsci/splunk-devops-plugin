@@ -147,7 +147,7 @@ Example: `java -Dsplunkins.buffer=4096 -jar jenkins.war`
 |splunkins.debugLogBatchSize|128|batch size for sending verbose level (FINE,FINER,FINEST) log record|
 |splunkins.enableRemoteTaskListenerDecorator|true|whether to capture remote TaskListener|
 |splunkins.ignoreConfigChangePattern|(?:queue&#124;nodeMonitors&#124;UpdateCenter&#124;global-build-stats).xml&#124;/(?:fingerprint&#124;builds&#124;config-history)/.*?xml|regular expression for ignoring config file changes|
-|splunkins.verifySSL|false|enable ssl certificate verification for splunk endpoint|
+|splunkins.verifySSL|false|enable ssl certificate verification for splunk endpoint,deprecated, use form config instead|
 |splunkins.junitStdioLimit|2097152|trim long junit standard output/error, set it to 0 for unlimited|
 |splunkins.decodePipelineConsole|true|decode pipeline job console note to get parallel label, link href|
 |splunkins.auditPostRequest|true|audit trail for script invoking, credentials updating|

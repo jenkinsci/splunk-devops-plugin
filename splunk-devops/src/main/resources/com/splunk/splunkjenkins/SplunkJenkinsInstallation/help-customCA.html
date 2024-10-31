@@ -1,0 +1,12 @@
+<div>
+    PEM formatted CA certificate<br/>
+        please check splunk doc
+    <a href="https://docs.splunk.com/Documentation/Splunk/7.1.2/Security/Howtoself-signcertificates">How to self-sign certificates</a> <br/>
+    the "HTTP Input Host" field should match certificate's common name or one of the subject alternative names. <br/>
+    splunk default CA certificate is $SPLUNK_HOME/auth/cacert.pem, please only copy certificate from section <br/>
+    "-----BEGIN CERTIFICATE-----" to "-----END CERTIFICATE-----" <br/>
+        To verify CA using curl command <br/>
+        <code>
+            curl --cacert $SPLUNK_HOME/auth/cacert.pem https://host:port/services/collector/health
+        </code>
+</div>

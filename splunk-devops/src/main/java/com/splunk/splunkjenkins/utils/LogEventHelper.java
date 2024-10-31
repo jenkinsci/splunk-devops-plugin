@@ -35,10 +35,14 @@ import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import shaded.splk.org.apache.http.HttpResponse;
 import shaded.splk.org.apache.http.client.HttpClient;
+import shaded.splk.org.apache.http.client.config.CookieSpecs;
+import shaded.splk.org.apache.http.client.config.RequestConfig;
 import shaded.splk.org.apache.http.client.entity.GzipCompressingEntity;
 import shaded.splk.org.apache.http.client.methods.HttpPost;
 import shaded.splk.org.apache.http.client.utils.URIBuilder;
+import shaded.splk.org.apache.http.conn.HttpClientConnectionManager;
 import shaded.splk.org.apache.http.entity.StringEntity;
+import shaded.splk.org.apache.http.impl.client.HttpClients;
 import shaded.splk.org.apache.http.util.EntityUtils;
 
 import java.io.*;
@@ -138,7 +142,10 @@ public class LogEventHelper {
 
     public static FormValidation verifyHttpInput(SplunkJenkinsInstallation config) {
         HttpPost post = buildPost(new EventRecord("ping from jenkins plugin", EventType.LOG), config);
-        HttpClient client = SplunkLogService.getInstance().getClient();
+        HttpClientConnectionManager mgr=SplunkLogService.getInstance().buildConnectionManager(config.isTlsVerify(),config.getCustomCA());
+        HttpClient client=HttpClients.custom().setConnectionManager(mgr).useSystemProperties()
+                .setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build())
+                .build();
         try {
             HttpResponse response = client.execute(post);
             if (response.getStatusLine().getStatusCode() != 200) {
@@ -165,6 +172,7 @@ public class LogEventHelper {
             return FormValidation.error(e.getMessage());
         } finally {
             post.releaseConnection();
+            mgr.shutdown();
         }
         return FormValidation.ok("Splunk connection verified");
     }
