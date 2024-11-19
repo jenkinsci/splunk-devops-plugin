@@ -1,3 +1,9 @@
+### 1.10.2 (November 19, 2024)
+- ensure `SplunkJenkinsInstallation.load` calculates metadataItemSet, thanks to [Jesse Glick](https://github.com/jglick)
+- JENKINS-74134 CSP compatibility
+- replace xml parser with html parser to handle html mark up properly
+- bump script-security dependency version
+
 ### 1.10.1 (February 15, 2023)
 - allow user to hide splunk hyperlink, thanks to [StefanSpieker](https://github.com/StefanSpieker)
 - update splunk hyperlink for [Splunk App for Jenkins](https://splunkbase.splunk.com/app/3332), thanks to [Michael Fitoussi](https://github.com/mifitous)
