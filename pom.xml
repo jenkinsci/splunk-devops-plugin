@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.41</version>
+        <version>4.52</version>
         <relativePath />
     </parent>
 
@@ -51,7 +51,7 @@
         <project.patchManagement.url>https://api.github.com</project.patchManagement.url>
         <patch.tracker.serverId>jenkins-jira</patch.tracker.serverId>
         <findbugs-maven-plugin.version>3.0.1</findbugs-maven-plugin.version>
-        <java.level>8</java.level>
+        <java.level>11</java.level>
         <!-- jenkins requirement -->
         <jenkins.version>2.387.3</jenkins.version> <!-- plugin script-security and workflow-cps requirement -->
         <spotbugs.failOnError>false</spotbugs.failOnError>
