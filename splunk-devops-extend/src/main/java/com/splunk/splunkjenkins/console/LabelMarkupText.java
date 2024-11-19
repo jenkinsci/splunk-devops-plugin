@@ -26,6 +26,7 @@ public class LabelMarkupText extends MarkupText {
     private String encloseLabel = null;
     private SoftReference<Map<String, String>> encloseLabelRef = new SoftReference<>(new HashMap<>());
     private String annotation = null;
+    private Object lock = new Object();
 
     public LabelMarkupText() {
         super("");
@@ -94,11 +95,16 @@ public class LabelMarkupText extends MarkupText {
     }
 
     public void write(OutputStream out) throws IOException {
-        if (isNotEmpty(annotation)) {
-            out.write(annotation.getBytes(UTF_8));
-            out.write(' ');
-            //clear annotation
-            annotation = null;
+        if (isDisabled) {
+            return;
+        }
+        synchronized (lock) {
+            if (isNotEmpty(annotation)) {
+                out.write(annotation.getBytes(UTF_8));
+                out.write(' ');
+                //clear annotation
+                annotation = "";
+            }
         }
     }
 
