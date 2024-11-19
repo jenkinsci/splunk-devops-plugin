@@ -35,7 +35,7 @@ public class ConsoleNoteHandler {
     }
 
     /**
-     * parse first html tag <a><a/> or <span></span> with nodeId attribute
+     * parse first html tag <a></a> or <span></span> with nodeId attribute
      *
      * @param tag
      * @see org.jenkinsci.plugins.workflow.job.console.NewNodeConsoleNote

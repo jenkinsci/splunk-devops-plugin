@@ -648,7 +648,7 @@ public class LogEventHelper {
 
     /**
      * @param configPath the absolute path
-     * @return the relative path to <tt>JENKINS_HOME</tt> directory
+     * @return the relative path to <code>JENKINS_HOME</code> directory
      */
     public static String getRelativeJenkinsHomePath(String configPath) {
         String jenkinsHome = Jenkins.getInstance().getRootDir().getPath();

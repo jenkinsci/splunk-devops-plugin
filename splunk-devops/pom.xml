@@ -40,7 +40,9 @@
             <email>xiao.xj@outlook.com</email>
         </developer>
     </developers>
-
+    <properties>
+        <javadocSourcepath>${project.basedir}/src/main;${project.basedir}/target/generated-sources/localizer;${project.basedir}/target/generated-sources/groovy-stubs</javadocSourcepath>
+    </properties>
     <build>
         <plugins>
             <plugin>
@@ -109,6 +111,13 @@
                         </requireUpperBoundDeps>
                     </rules>
                     <fail>false</fail>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <sourcepath>${javadocSourcepath}</sourcepath>
                 </configuration>
             </plugin>
         </plugins>
