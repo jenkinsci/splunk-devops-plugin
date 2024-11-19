@@ -53,7 +53,7 @@
         <findbugs-maven-plugin.version>3.0.1</findbugs-maven-plugin.version>
         <java.level>8</java.level>
         <!-- jenkins requirement -->
-        <jenkins.version>2.346.1</jenkins.version> <!-- plugin script-security and workflow-cps requirement -->
+        <jenkins.version>2.387.3</jenkins.version> <!-- plugin script-security and workflow-cps requirement -->
         <spotbugs.failOnError>false</spotbugs.failOnError>
         <surefire.timeout>600</surefire.timeout>
     </properties>

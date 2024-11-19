@@ -199,7 +199,7 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>script-security</artifactId>
-            <version>1229.v4880b_b_e905a_6</version>
+            <version>1336.vf33a_a_9863911</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
