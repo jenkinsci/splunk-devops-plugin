@@ -19,6 +19,12 @@
                  help="/descriptorByName/com.splunk.splunkjenkins.SplunkJenkinsInstallation/help/httpInputConfig">
             <f:checkbox default="true"/>
         </f:entry>
+        <f:entry title="${%Verify Server Certificate}" field="verifyCertificate">
+            <f:checkbox />
+        </f:entry>
+         <f:entry title="${%Custom CA Certificate}" field="customCA">
+             <f:textarea/>
+         </f:entry>
         <f:entry title="${%Send All Pipeline Console Logs}" field="globalPipelineFilter">
             <f:checkbox default="true" />
         </f:entry>
@@ -26,7 +32,7 @@
             <f:textbox clazz="required"/>
         </f:entry>
         <f:validateButton title="${%Test Connection}" progress="${%Testing...}" method="testHttpInput"
-                          with="host,port,token,useSSL,metaDataConfig"/>
+                          with="host,port,token,useSSL,metaDataConfig,verifyCertificate,customCA"/>
         <f:advanced>
             <f:entry title="${%Raw Events Supported}" field="rawEventEnabled">
                 <f:checkbox default="true"/>

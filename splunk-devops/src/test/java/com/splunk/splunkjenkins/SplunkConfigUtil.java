@@ -124,6 +124,7 @@ public class SplunkConfigUtil {
         config.setHost(host);
         config.setPort(8088);
         config.setUseSSL(true);
+        config.setVerifyCertificate(false);
         config.setToken(token);
         config.setRawEventEnabled(true);
         config.setEnabled(true);

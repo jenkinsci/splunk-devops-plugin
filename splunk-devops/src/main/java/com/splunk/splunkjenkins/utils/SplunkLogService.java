@@ -15,17 +15,12 @@ import shaded.splk.org.apache.http.conn.ConnectionKeepAliveStrategy;
 import shaded.splk.org.apache.http.conn.HttpClientConnectionManager;
 import shaded.splk.org.apache.http.conn.socket.ConnectionSocketFactory;
 import shaded.splk.org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import shaded.splk.org.apache.http.conn.ssl.NoopHostnameVerifier;
 import shaded.splk.org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import shaded.splk.org.apache.http.conn.ssl.TrustStrategy;
 import shaded.splk.org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import shaded.splk.org.apache.http.impl.client.HttpClients;
 import shaded.splk.org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import shaded.splk.org.apache.http.protocol.HttpContext;
-import shaded.splk.org.apache.http.ssl.SSLContexts;
 
-import javax.net.ssl.SSLContext;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -42,7 +37,6 @@ import static com.splunk.splunkjenkins.model.EventType.BATCH_JSON;
 
 public class SplunkLogService {
     public static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(SplunkLogService.class.getName());
-    private static final boolean VERIFY_SSL = Boolean.getBoolean("splunkins.verifySSL");
     private final static int SOCKET_TIMEOUT = 3;
     private final static int QUEUE_SIZE = Integer.getInteger(SplunkLogService.class.getName() + ".queueSize", 1 << 17);
     private final static long KEEP_ALIVE_TIME_MINUTES = 2;
@@ -60,8 +54,8 @@ public class SplunkLogService {
         this.workers = new ArrayList<LogConsumer>();
     }
 
-    private void initHttpClient() {
-        this.connMgr = buildConnectionManager();
+    private void initHttpClient(boolean verifyCA, String certificate) {
+        this.connMgr = buildConnectionManager(verifyCA, certificate);
         ConnectionKeepAliveStrategy myStrategy = new DefaultConnectionKeepAliveStrategy() {
             @Override
             public long getKeepAliveDuration(HttpResponse httpResponse, HttpContext httpContext) {
@@ -73,36 +67,27 @@ public class SplunkLogService {
             }
         };
         this.client = HttpClients.custom()
-            .setConnectionManager(this.connMgr)
-            .setKeepAliveStrategy(myStrategy)
-            .setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build())
-            .useSystemProperties()
-            .build();
+                .setConnectionManager(this.connMgr)
+                .setKeepAliveStrategy(myStrategy)
+                .setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build())
+                .useSystemProperties()
+                .build();
     }
 
     public static SplunkLogService getInstance() {
         return InstanceHolder.service;
     }
 
-    private HttpClientConnectionManager buildConnectionManager() {
-        SSLConnectionSocketFactory sslConnectionSocketFactory = null;
-        if (!VERIFY_SSL) {
-            SSLContext sslContext = null;
-            try {
-                TrustStrategy acceptingTrustStrategy = new TrustAllStrategy();
-                sslContext = SSLContexts.custom().setProtocol("TLSv1.2").loadTrustMaterial(
-                        null, acceptingTrustStrategy).build();
-            } catch (Exception e) {
-                sslContext = SSLContexts.createDefault();
-            }
-            sslConnectionSocketFactory = new CustomSSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
-        } else {
-            sslConnectionSocketFactory = new SSLConnectionSocketFactory(
-                    SSLContexts.createDefault(),
-                    new String[]{"TLSv1.2"},
-                    null,
-                    SSLConnectionSocketFactory.getDefaultHostnameVerifier());
-        }
+    public void rebuild(boolean verifyCA, String certificate) {
+        LOG.warning("refresh http client configs, shutdown connection pool");
+        stopWorker();
+        connMgr.shutdown();
+        initHttpClient(verifyCA, certificate);
+    }
+
+    protected static HttpClientConnectionManager buildConnectionManager(boolean verifyCA, String certificate) {
+        LOG.log(Level.FINE, "build connection mgr using verify-ca={0} root-ca={1}", new Object[]{verifyCA, certificate});
+        SSLConnectionSocketFactory sslConnectionSocketFactory = CustomSSLConnectionSocketFactory.getSocketFactory(verifyCA, certificate);
         Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
                 .register("http", PlainConnectionSocketFactory.getSocketFactory())
                 .register("https", sslConnectionSocketFactory)
@@ -168,7 +153,7 @@ public class SplunkLogService {
             } else {
                 record = (EventRecord) message;
             }
-            Object content=record.getMessage();
+            Object content = record.getMessage();
             if (content == null || "".equals(content) || "\n".equals(content)) {
                 continue;
             }
@@ -329,7 +314,8 @@ public class SplunkLogService {
         static {
             service = new SplunkLogService();
             try {
-                service.initHttpClient();
+                SplunkJenkinsInstallation splkInstall = SplunkJenkinsInstallation.get();
+                service.initHttpClient(splkInstall.isTlsVerify(), splkInstall.getCustomCA());
             } catch (java.lang.NoSuchFieldError e) {
                 /*
                   java.lang.NoSuchFieldError: INSTANCE
@@ -345,12 +331,5 @@ public class SplunkLogService {
         sbr.append("remaining:").append(this.getQueueSize()).append(" ")
                 .append("sent:").append(this.getSentCount());
         return sbr.toString();
-    }
-
-    static class TrustAllStrategy implements TrustStrategy {
-        public boolean isTrusted(X509Certificate[] certificate,
-                                 String type) {
-            return true;
-        }
     }
 }
