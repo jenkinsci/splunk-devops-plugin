@@ -120,7 +120,7 @@ public class LogEventHelper {
             updateContent(postMethod, jsonRecord, true);
             postMethod.setHeader("x-splunk-request-channel", JSON_CHANNEL_ID);
         }
-        postMethod.setHeader("Authorization", "Splunk " + config.getToken());
+        postMethod.setHeader("Authorization", "Splunk " + config.getTokenValue());
         return postMethod;
     }
 
@@ -141,12 +141,13 @@ public class LogEventHelper {
         HttpClient client = SplunkLogService.getInstance().getClient();
         try {
             HttpResponse response = client.execute(post);
-            if (response.getStatusLine().getStatusCode() != 200) {
+            int respCode = response.getStatusLine().getStatusCode();
+            if (respCode != 200) {
                 String reason = response.getStatusLine().getReasonPhrase();
-                if (response.getStatusLine().getStatusCode() == 400) {
+                if (respCode == 400) {
                     return FormValidation.error("Incorrect index name or do not have write permission to the default index, please check MetaData configuration");
                 } else {
-                    return FormValidation.error("Token:" + config.getToken() + " response:" + reason);
+                    return FormValidation.error("Code:" + respCode + " Response:" + reason);
                 }
             }
             EntityUtils.consume(response.getEntity());

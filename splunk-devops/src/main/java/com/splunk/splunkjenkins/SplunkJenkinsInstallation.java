@@ -3,10 +3,12 @@ package com.splunk.splunkjenkins;
 import com.splunk.splunkjenkins.model.EventType;
 import com.splunk.splunkjenkins.model.MetaDataConfigItem;
 import com.splunk.splunkjenkins.utils.SplunkLogService;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import groovy.lang.GroovyCodeSource;
 import hudson.Extension;
 import hudson.Util;
 import hudson.util.FormValidation;
+import hudson.util.Secret;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import jenkins.model.JenkinsLocationConfiguration;
@@ -62,7 +64,7 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
     // Defaults plugin global config values
     private boolean enabled = false;
     private String host;
-    private String token;
+    private Secret token;
     private boolean useSSL = true;
     private Integer port = 8088;
     //for console log default cache size for 256KB
@@ -216,7 +218,8 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
     }
 
     @RequirePOST
-    public FormValidation doCheckToken(@QueryParameter("value") String value) {
+    public FormValidation doCheckToken(@QueryParameter("value") Secret token) {
+        String value=Secret.toString(token);
         //check GUID format such as 18654C68-B28B-4450-9CF0-6E7645CA60CA
         if (StringUtils.isBlank(value) || !uuidPattern.matcher(value).find()) {
             return FormValidation.warning(Messages.InvalidToken());
@@ -227,7 +230,7 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
 
     @RequirePOST
     public FormValidation doTestHttpInput(@QueryParameter String host, @QueryParameter int port,
-                                          @QueryParameter String token, @QueryParameter boolean useSSL,
+                                          @QueryParameter Secret token, @QueryParameter boolean useSSL,
                                           @QueryParameter String metaDataConfig) {
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
         //create new instance to avoid pollution global config
@@ -325,7 +328,7 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         }
         // During startup, hudson.model.User.current() calls User.load which will load other plugins, will throw error:
         // Tried proxy for com.splunk.splunkjenkins.SplunkJenkinsInstallation to support a circular dependency, but it is not an interface.
-        // Use Jenkins.getAuthentication() will by pass the issue
+        // Use Jenkins.getAuthentication() will bypass the issue
         Authentication auth = Jenkins.getAuthentication();
         String userName = auth.getName();
 
@@ -361,7 +364,7 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
      * @return true setup is completed
      */
     public boolean isValid() {
-        return enabled && host != null && token != null
+        return enabled && host != null && token != null && isNotEmpty(token.getPlainText())
                 && jsonUrl != null && rawUrl != null;
     }
 
@@ -399,10 +402,14 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         return rawEventEnabled && eventType.needSplit();
     }
 
-    public String getToken() {
+    public Secret getToken() {
         return token;
     }
 
+    @NonNull
+    public String getTokenValue() {
+        return Secret.toString(token);
+    }
     public long getMaxRetries() {
         return retriesOnError;
     }
@@ -459,7 +466,7 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         this.host = host;
     }
 
-    public void setToken(String token) {
+    public void setToken(Secret token) {
         this.token = token;
     }
 
@@ -529,7 +536,7 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
 
     public Map toMap() {
         HashMap map = new HashMap();
-        map.put("token", this.token);
+        map.put("token", this.getTokenValue());
         map.put("rawEventEnabled", this.rawEventEnabled);
         map.put("maxEventsBatchSize", this.maxEventsBatchSize);
         map.put("host", host);

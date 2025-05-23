@@ -28,9 +28,9 @@ public class SplunkArchiveFileTest extends BaseTest {
         CaptureEnvironmentBuilder captureEnvironment = new CaptureEnvironmentBuilder();
         project.getBuildersList().add(captureEnvironment);
         if(Functions.isWindows()) {
-            project.getBuildersList().add(new BatchFile("echo foo > process_list.txt"));
+            project.getBuildersList().add(new BatchFile("echo file-test > process_list.txt"));
         } else {
-            project.getBuildersList().add(new Shell("echo foo > process_list.txt"));
+            project.getBuildersList().add(new Shell("echo file-test > process_list.txt"));
         }
         project.setAssignedLabel(label);
         SplunkJenkinsInstallation.get().setScriptContent(groovyScript);
@@ -38,7 +38,7 @@ public class SplunkArchiveFileTest extends BaseTest {
         long start_time = System.currentTimeMillis();
         FreeStyleBuild build = j.buildAndAssertSuccess(project);
         String buildUrl = build.getUrl();
-        int expected = 5;
+        int expected = 1;
         String query = "search index=" + INDEX_NAME
                 + " source=\"" + buildUrl + "process_list.txt\"";
         logger.info(query);

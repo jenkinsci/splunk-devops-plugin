@@ -26,16 +26,23 @@ package com.splunk.splunkjenkins;
 
 import com.splunk.splunkjenkins.model.EventType;
 import com.splunk.splunkjenkins.model.MetaDataConfigItem;
+
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
+
+import com.splunk.splunkjenkins.utils.RemoteUtils;
+import hudson.util.Secret;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.FileUtils;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -61,4 +68,22 @@ public final class SplunkJenkinsInstallationTest {
         assertThat(metadataItemSet.iterator().next().getValue(), is("value999"));
     }
 
+
+    @Test
+    public void testTokenConvert() {
+        String token = "hello-token";
+        String host = "foo-host";
+        SplunkJenkinsInstallation cfg = SplunkJenkinsInstallation.get();
+        cfg.setToken(Secret.fromString(token));
+        cfg.setHost(host);
+        Map config = cfg.toMap();
+        // try to convert back, will set to cachedConfig
+        RemoteUtils.initSplunkConfigOnAgent(config);
+        cfg.setHost(null);
+        cfg.setToken(null);
+        // try to get the cached config which will be used for remoting
+        cfg = SplunkJenkinsInstallation.get();
+        assertThat(cfg.getHost(), is(host));
+        assertThat(cfg.getTokenValue(), is(token));
+    }
 }

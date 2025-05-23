@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.splunk.*;
 import com.splunk.splunkjenkins.model.EventType;
 import com.splunk.splunkjenkins.utils.SplunkLogService;
+import hudson.util.Secret;
 import org.apache.commons.io.IOUtils;
 import shaded.splk.com.google.gson.Gson;
 
@@ -124,7 +125,7 @@ public class SplunkConfigUtil {
         config.setHost(host);
         config.setPort(8088);
         config.setUseSSL(true);
-        config.setToken(token);
+        config.setToken(Secret.fromString(token));
         config.setRawEventEnabled(true);
         config.setEnabled(true);
         config.setScriptPath(null);

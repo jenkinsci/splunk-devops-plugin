@@ -1,3 +1,8 @@
+### 1.11.0 (May 24, 2025)
+- Mask the http event collector token using `Secret`
+  Warning: If you upgraded to 1.11.x , then downgraded to older version, token may show as encrypted text, please reconfigure the token on Jenkins UI
+
+
 ### 1.10.2 (November 19, 2024)
 - ensure `SplunkJenkinsInstallation.load` calculates metadataItemSet, thanks to [Jesse Glick](https://github.com/jglick)
 - JENKINS-74134 CSP compatibility
