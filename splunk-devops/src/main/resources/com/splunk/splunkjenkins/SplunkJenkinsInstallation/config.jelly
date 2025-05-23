@@ -13,7 +13,7 @@
             <f:number clazz="positive-number" max="65535" default="8088" checkMethod="post" />
         </f:entry>
         <f:entry title="${%HTTP Input Token}" field="token">
-            <f:textbox clazz="required" checkMethod="post" />
+            <f:password clazz="required" checkMethod="post" />
         </f:entry>
         <f:entry title="${%SSL Enabled}" field="useSSL"
                  help="/descriptorByName/com.splunk.splunkjenkins.SplunkJenkinsInstallation/help/httpInputConfig">
@@ -57,7 +57,7 @@
                           checked="${instance.getScriptPath() !=null}" inline="true">
                 <f:entry field="scriptPath"
                          help="/descriptorByName/com.splunk.splunkjenkins.SplunkJenkinsInstallation/help/groovyBinding">
-                    <f:textbox/>
+                    <f:textbox style="min-width:800px" />
                 </f:entry>
             </f:radioBlock>
             <f:radioBlock name="commandsOrFileInSplunkins" value="content"
@@ -65,7 +65,7 @@
                           checked="${instance.getScriptPath() == null }" inline="true">
                 <f:entry help="/descriptorByName/com.splunk.splunkjenkins.SplunkJenkinsInstallation/help/groovyBinding"
                          field="scriptContent">
-                    <f:textarea class="fixed-width" value="${instance.getScriptOrDefault()}" checkMethod="post"
+                    <f:textarea style="min-width:800px" class="fixed-width" value="${instance.getScriptOrDefault()}" checkMethod="post"
                     />
                 </f:entry>
             </f:radioBlock>
