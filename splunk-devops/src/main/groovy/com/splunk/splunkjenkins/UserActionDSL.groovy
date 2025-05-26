@@ -5,7 +5,7 @@ import com.splunk.splunkjenkins.utils.LogEventHelper
 import hudson.model.Run
 import hudson.model.TaskListener
 import jenkins.model.Jenkins
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApproval

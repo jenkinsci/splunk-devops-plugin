@@ -4,16 +4,17 @@ import com.google.common.collect.ImmutableMap;
 import com.splunk.splunkjenkins.model.CoverageMetricsAdapter;
 import groovy.lang.GroovyClassLoader;
 import hudson.scm.SCM;
+import java.time.Instant;
 import jenkins.model.CauseOfInterruption;
 import jenkins.model.InterruptedBuildAction;
 import jenkins.triggers.SCMTriggerItem;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.GroovySandbox;
 import org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApproval;
 import org.jenkinsci.plugins.scriptsecurity.scripts.languages.GroovyLanguage;
-import shaded.splk.com.google.gson.FieldNamingStrategy;
-import shaded.splk.com.google.gson.Gson;
-import shaded.splk.com.google.gson.GsonBuilder;
+import com.google.gson.FieldNamingStrategy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.splunk.splunkjenkins.Constants;
 import com.splunk.splunkjenkins.SplunkJenkinsInstallation;
 import com.splunk.splunkjenkins.model.EventRecord;
@@ -33,13 +34,13 @@ import hudson.util.DescribableList;
 import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
-import shaded.splk.org.apache.http.HttpResponse;
-import shaded.splk.org.apache.http.client.HttpClient;
-import shaded.splk.org.apache.http.client.entity.GzipCompressingEntity;
-import shaded.splk.org.apache.http.client.methods.HttpPost;
-import shaded.splk.org.apache.http.client.utils.URIBuilder;
-import shaded.splk.org.apache.http.entity.StringEntity;
-import shaded.splk.org.apache.http.util.EntityUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.GzipCompressingEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
@@ -61,7 +62,7 @@ import static com.splunk.splunkjenkins.model.EventType.BATCH_JSON;
 import static com.splunk.splunkjenkins.model.EventType.JENKINS_CONFIG;
 import static com.splunk.splunkjenkins.model.EventType.SLAVE_INFO;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.commons.lang.reflect.MethodUtils.getAccessibleMethod;
+import static org.apache.commons.lang3.reflect.MethodUtils.getAccessibleMethod;
 
 public class LogEventHelper {
     //see also hudson.util.wrapToErrorSpan
@@ -444,7 +445,7 @@ public class LogEventHelper {
         slaveInfo.put("url", Jenkins.getInstance().getRootUrl() + computer.getUrl());
         long connectTime = computer.getConnectTime();
         if (connectTime != 0) {
-            slaveInfo.put("connect_time", Util.XS_DATETIME_FORMATTER.format(connectTime));
+            slaveInfo.put("connect_time", Util.XS_DATETIME_FORMATTER2.format(Instant.ofEpochMilli(connectTime)));
         } else {
             //slave is offline or disconnected
             slaveInfo.put("connect_time", 0);

@@ -2,12 +2,12 @@ package com.splunk.splunkjenkins.utils;
 
 import com.splunk.splunkjenkins.SplunkJenkinsInstallation;
 import com.splunk.splunkjenkins.model.EventRecord;
-import shaded.splk.org.apache.http.HttpEntity;
-import shaded.splk.org.apache.http.HttpResponse;
-import shaded.splk.org.apache.http.client.HttpClient;
-import shaded.splk.org.apache.http.client.ResponseHandler;
-import shaded.splk.org.apache.http.client.methods.HttpPost;
-import shaded.splk.org.apache.http.util.EntityUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.SSLException;
 import java.io.IOException;

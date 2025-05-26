@@ -1,2 +1,8 @@
 // https://github.com/jenkins-infra/pipeline-library
-buildPlugin(platforms: ['linux'], jdkVersions: [8, 11], useArtifactCachingProxy:false)
+buildPlugin(
+  useContainerAgent: true,
+  useArtifactCachingProxy:false,
+  forkCount: '1C',
+  configurations: [
+    [platform: 'linux', jdk: 17]
+])

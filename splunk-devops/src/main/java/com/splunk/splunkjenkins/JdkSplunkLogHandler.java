@@ -87,7 +87,7 @@ public class JdkSplunkLogHandler extends Handler {
         private final String[] skipLoggerNames = {
                 SplunkLogService.class.getName(), LogConsumer.class.getName(),
                 "jenkins.InitReactorRunner", "hudson.util.BootFailure",
-                "shaded.splk.org.apache.http", "hudson.node_monitors", "hudson.Extension"};
+                "org.apache.http", "hudson.node_monitors", "hudson.Extension"};
 
         @Override
         public boolean isLoggable(LogRecord record) {

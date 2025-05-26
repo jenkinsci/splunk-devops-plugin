@@ -1,6 +1,6 @@
 package com.splunk.splunkjenkins.utils;
 
-import shaded.splk.org.apache.http.conn.DnsResolver;
+import org.apache.http.conn.DnsResolver;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

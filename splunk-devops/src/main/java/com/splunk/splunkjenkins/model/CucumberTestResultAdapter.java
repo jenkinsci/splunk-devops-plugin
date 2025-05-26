@@ -5,7 +5,7 @@ import gherkin.formatter.model.Step;
 import hudson.Extension;
 import hudson.tasks.test.TestObject;
 import hudson.tasks.test.TestResult;
-import org.apache.commons.lang.reflect.FieldUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jenkinsci.plugins.cucumber.jsontestsupport.*;
 
 import java.util.ArrayList;

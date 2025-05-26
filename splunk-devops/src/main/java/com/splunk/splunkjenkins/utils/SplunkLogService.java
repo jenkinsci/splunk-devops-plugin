@@ -4,25 +4,25 @@ import com.google.common.base.Strings;
 import com.splunk.splunkjenkins.SplunkJenkinsInstallation;
 import com.splunk.splunkjenkins.model.EventRecord;
 import com.splunk.splunkjenkins.model.EventType;
-import shaded.splk.org.apache.http.HttpResponse;
-import shaded.splk.org.apache.http.client.HttpClient;
-import shaded.splk.org.apache.http.client.config.CookieSpecs;
-import shaded.splk.org.apache.http.client.config.RequestConfig;
-import shaded.splk.org.apache.http.config.Registry;
-import shaded.splk.org.apache.http.config.RegistryBuilder;
-import shaded.splk.org.apache.http.config.SocketConfig;
-import shaded.splk.org.apache.http.conn.ConnectionKeepAliveStrategy;
-import shaded.splk.org.apache.http.conn.HttpClientConnectionManager;
-import shaded.splk.org.apache.http.conn.socket.ConnectionSocketFactory;
-import shaded.splk.org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import shaded.splk.org.apache.http.conn.ssl.NoopHostnameVerifier;
-import shaded.splk.org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import shaded.splk.org.apache.http.conn.ssl.TrustStrategy;
-import shaded.splk.org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
-import shaded.splk.org.apache.http.impl.client.HttpClients;
-import shaded.splk.org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import shaded.splk.org.apache.http.protocol.HttpContext;
-import shaded.splk.org.apache.http.ssl.SSLContexts;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.config.SocketConfig;
+import org.apache.http.conn.ConnectionKeepAliveStrategy;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.ssl.SSLContexts;
 
 import javax.net.ssl.SSLContext;
 import java.security.cert.X509Certificate;
@@ -333,7 +333,7 @@ public class SplunkLogService {
             } catch (java.lang.NoSuchFieldError e) {
                 /*
                   java.lang.NoSuchFieldError: INSTANCE
-                  at shaded.splk.org.apache.http.conn.ssl.SSLConnectionSocketFactory.<clinit>(SSLConnectionSocketFactory.java:144)
+                  at org.apache.http.conn.ssl.SSLConnectionSocketFactory.<clinit>(SSLConnectionSocketFactory.java:144)
                 */
                 LOG.log(Level.SEVERE, "init httpclient failed, version conflicts", e);
             }

@@ -42,7 +42,6 @@ public class ConsoleNoteHandler {
      * @see hudson.console.HyperlinkNote
      * @see org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApprovalNote
      */
-    @SuppressFBWarnings("SF_SWITCH_NO_DEFAULT")
     public void read(String tag) {
         Document doc = Jsoup.parse(tag);
         Element nodeEle = doc.getElementsByTag("a").first();

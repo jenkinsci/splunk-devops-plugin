@@ -1,8 +1,8 @@
 package com.splunk.splunkjenkins.utils;
 
-import shaded.splk.org.apache.http.HttpHost;
-import shaded.splk.org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import shaded.splk.org.apache.http.protocol.HttpContext;
+import org.apache.http.HttpHost;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.protocol.HttpContext;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;

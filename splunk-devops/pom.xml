@@ -42,13 +42,13 @@
     </developers>
     <properties>
         <javadocSourcepath>${project.basedir}/src/main;${project.basedir}/target/generated-sources/localizer;${project.basedir}/target/generated-sources/groovy-stubs</javadocSourcepath>
+        <hpi.compatibleSinceVersion>1.5</hpi.compatibleSinceVersion>
     </properties>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
-                <version>3.0.2</version>
                 <executions>
                     <execution>
                         <goals>
@@ -63,54 +63,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
                 <configuration>
                     <!--skip generated sources-->
                     <sourcepath>${basedir}/src/main/java/;${basedir}/src/main/groovy</sourcepath>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <excludes>
-                        <exclude>**/test-dependencies/*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jenkins-ci.tools</groupId>
-                <artifactId>maven-hpi-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <compatibleSinceVersion>1.5</compatibleSinceVersion>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <configuration>
-                    <rules>
-                        <requireUpperBoundDeps>
-                            <excludes combine.children="append">
-                                <exclude>org.apache.maven.reporting:maven-reporting-api</exclude>
-                                <exclude>org.apache.maven.doxia:doxia-sink-api</exclude>
-                                <exclude>org.apache.maven.doxia:doxia-logging-api</exclude>
-                                <exclude>org.apache.maven:maven-plugin-api</exclude>
-                                <exclude>org.apache.maven:maven-plugin</exclude>
-                                <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
-                            </excludes>
-                        </requireUpperBoundDeps>
-                    </rules>
-                    <fail>false</fail>
                 </configuration>
             </plugin>
             <plugin>
@@ -123,9 +78,12 @@
         </plugins>
     </build>
 
-    <!-- If you want to depend on other plugins: -->
+  <!-- If you want to depend on other plugins: -->
     <dependencies>
-
+        <dependency>
+            <groupId>io.jenkins.plugins</groupId>
+            <artifactId>commons-lang3-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
@@ -135,16 +93,18 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>junit</artifactId>
-            <version>1.47</version>
             <optional>true</optional><!-- from jenkins-core detached-plugins -->
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>testng-plugin</artifactId>
-            <version>1.14</version>
+            <version>940.vc244edffc2ec</version>
             <optional>true</optional>
         </dependency>
-
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>apache-httpcomponents-client-4-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>cucumber-testresult-plugin</artifactId>
@@ -154,7 +114,7 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>clover</artifactId>
-            <version>4.7.1</version>
+            <version>4.14.2.628.ve412b_714e733</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -171,16 +131,8 @@
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>scm-api</artifactId>
-            <version>2.4.1</version>
-            <optional>true</optional>
-            <scope>test</scope>
-            <!-- cobertura requires scm-api 2.4.1 or higher -->
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>jacoco</artifactId>
-            <version>2.1.0</version>
+            <version>3.3.7</version>
             <optional>true</optional>
             <exclusions>
                 <exclusion>
@@ -208,26 +160,10 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>script-security</artifactId>
-            <version>1336.vf33a_a_9863911</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>splunk-devops-shaded</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpcore</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpclient</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.code.gson</groupId>
-                    <artifactId>gson</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>io.jenkins.plugins</groupId>
+            <artifactId>gson-api</artifactId>
         </dependency>
     </dependencies>
 

@@ -3,10 +3,9 @@ package com.splunk.splunkjenkins;
 import com.google.common.collect.ImmutableMap;
 import com.splunk.*;
 import com.splunk.splunkjenkins.model.EventType;
-import com.splunk.splunkjenkins.utils.SplunkLogService;
 import hudson.util.Secret;
 import org.apache.commons.io.IOUtils;
-import shaded.splk.com.google.gson.Gson;
+import com.google.gson.Gson;
 
 import java.io.*;
 import java.util.HashMap;
@@ -17,7 +16,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
 
 public class SplunkConfigUtil {
     public static final String INDEX_NAME = System.getProperty("splunk-index", "plugin_sandbox");
