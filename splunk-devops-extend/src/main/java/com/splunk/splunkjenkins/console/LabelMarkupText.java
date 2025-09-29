@@ -2,7 +2,7 @@ package com.splunk.splunkjenkins.console;
 
 import com.splunk.splunkjenkins.utils.LogEventHelper;
 import hudson.MarkupText;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,8 +14,8 @@ import java.util.logging.Logger;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import static org.apache.commons.lang.StringUtils.startsWith;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.startsWith;
 
 public class LabelMarkupText extends MarkupText {
     private static final Boolean isDisabled = Boolean.getBoolean(LogEventHelper.class.getName() + ".disableLabelMarkup");

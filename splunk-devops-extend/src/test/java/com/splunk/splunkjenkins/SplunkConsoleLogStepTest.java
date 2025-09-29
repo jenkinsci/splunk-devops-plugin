@@ -1,7 +1,7 @@
 package com.splunk.splunkjenkins;
 
 import com.splunk.splunkjenkins.console.PipelineConsoleDecoder;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.flow.FlowDurabilityHint;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;

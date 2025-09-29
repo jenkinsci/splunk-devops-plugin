@@ -5,7 +5,7 @@ import com.splunk.splunkjenkins.console.SplunkTaskListenerFactory;
 import com.splunk.splunkjenkins.model.LoggingJobExtractor;
 import hudson.Extension;
 import hudson.model.Result;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.workflow.flow.FlowExecution;
 import org.jenkinsci.plugins.workflow.graphanalysis.ForkScanner;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
