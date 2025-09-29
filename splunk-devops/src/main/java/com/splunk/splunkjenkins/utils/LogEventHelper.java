@@ -49,6 +49,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -61,6 +62,7 @@ import static com.splunk.splunkjenkins.model.EventType.BATCH_JSON;
 import static com.splunk.splunkjenkins.model.EventType.JENKINS_CONFIG;
 import static com.splunk.splunkjenkins.model.EventType.SLAVE_INFO;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static org.apache.commons.lang.reflect.MethodUtils.getAccessibleMethod;
 
 public class LogEventHelper {
@@ -444,7 +446,7 @@ public class LogEventHelper {
         slaveInfo.put("url", Jenkins.getInstance().getRootUrl() + computer.getUrl());
         long connectTime = computer.getConnectTime();
         if (connectTime != 0) {
-            slaveInfo.put("connect_time", Util.XS_DATETIME_FORMATTER.format(connectTime));
+            slaveInfo.put("connect_time", ISO_INSTANT.format(Instant.ofEpochMilli(connectTime)));
         } else {
             //slave is offline or disconnected
             slaveInfo.put("connect_time", 0);
