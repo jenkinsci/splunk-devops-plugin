@@ -6,7 +6,7 @@ import hudson.model.Action;
 
 import com.splunk.splunkjenkins.Messages;
 import jenkins.model.Jenkins;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class LinkSplunkAction implements Action {
     String query;

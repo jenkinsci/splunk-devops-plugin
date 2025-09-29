@@ -2,7 +2,7 @@ package com.splunk.splunkjenkins.model;
 
 import com.splunk.splunkjenkins.SplunkJenkinsInstallation;
 import com.splunk.splunkjenkins.utils.LogEventHelper;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.lang.ref.SoftReference;

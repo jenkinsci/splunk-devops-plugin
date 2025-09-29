@@ -16,7 +16,7 @@ import net.sf.json.JSONObject;
 import org.acegisecurity.Authentication;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.scriptsecurity.scripts.ApprovalContext;
 import org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApproval;
 import org.jenkinsci.plugins.scriptsecurity.scripts.languages.GroovyLanguage;
@@ -51,8 +51,8 @@ import static com.splunk.splunkjenkins.utils.LogEventHelper.validateGroovyScript
 import static com.splunk.splunkjenkins.utils.LogEventHelper.verifyHttpInput;
 import static groovy.lang.GroovyShell.DEFAULT_CODE_BASE;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
-import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 
 @Extension

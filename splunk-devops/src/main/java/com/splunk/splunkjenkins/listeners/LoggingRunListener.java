@@ -15,7 +15,7 @@ import hudson.model.listeners.RunListener;
 import hudson.scm.ChangeLogSet;
 import jenkins.model.CauseOfInterruption;
 import jenkins.model.InterruptedBuildAction;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.*;

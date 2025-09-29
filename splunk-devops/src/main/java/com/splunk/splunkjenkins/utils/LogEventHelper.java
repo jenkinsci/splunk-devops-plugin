@@ -7,7 +7,7 @@ import hudson.scm.SCM;
 import jenkins.model.CauseOfInterruption;
 import jenkins.model.InterruptedBuildAction;
 import jenkins.triggers.SCMTriggerItem;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.GroovySandbox;
 import org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApproval;
 import org.jenkinsci.plugins.scriptsecurity.scripts.languages.GroovyLanguage;
@@ -63,7 +63,7 @@ import static com.splunk.splunkjenkins.model.EventType.JENKINS_CONFIG;
 import static com.splunk.splunkjenkins.model.EventType.SLAVE_INFO;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
-import static org.apache.commons.lang.reflect.MethodUtils.getAccessibleMethod;
+import static org.apache.commons.lang3.reflect.MethodUtils.getAccessibleMethod;
 
 public class LogEventHelper {
     //see also hudson.util.wrapToErrorSpan

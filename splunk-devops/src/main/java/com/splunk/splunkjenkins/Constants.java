@@ -1,7 +1,7 @@
 package com.splunk.splunkjenkins;
 
 import com.google.common.collect.ImmutableList;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

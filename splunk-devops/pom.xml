@@ -211,6 +211,11 @@
             <version>1336.vf33a_a_9863911</version>
         </dependency>
         <dependency>
+            <groupId>io.jenkins.plugins</groupId>
+            <artifactId>commons-lang3-api</artifactId>
+            <version>3.12.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>splunk-devops-shaded</artifactId>
             <version>${project.version}</version>
