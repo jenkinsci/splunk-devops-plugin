@@ -1,3 +1,6 @@
+### 1.11.1 (Nov 5, 2025)
+- remove org.apache.commons.lang and Util.XS_DATETIME_FORMATTE dependency because upstream will remove them, thanks to [Markus Winter](https://github.com/mawinter69)
+
 ### 1.11.0 (May 24, 2025)
 - Mask the http event collector token using `Secret`
   Warning: If you upgraded to 1.11.x , then downgraded to older version, token may show as encrypted text, please reconfigure the token on Jenkins UI
