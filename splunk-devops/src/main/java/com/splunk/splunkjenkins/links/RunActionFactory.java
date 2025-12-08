@@ -21,6 +21,11 @@ public class RunActionFactory extends TransientActionFactory<Run> {
         return Run.class;
     }
 
+    @Override
+    public Class<? extends Action> actionType() {
+        return LinkSplunkAction.class;
+    }
+
     @NonNull
     @Override
     public Collection<? extends Action> createFor(@NonNull Run target) {
