@@ -22,7 +22,8 @@ import static com.splunk.splunkjenkins.model.EventType.JENKINS_CONFIG;
 
 public class WebPostAccessLogger implements Filter {
     private static final Logger LOG = Logger.getLogger(WebPostAccessLogger.class.getName());
-    private static final Pattern FILTER_PATTERN = Pattern.compile("/(?:configSubmit|updateSubmit|script|doDelete)");
+    // Package-visible for testing
+    static final Pattern FILTER_PATTERN = Pattern.compile("/(?:configSubmit|createSubmit|updateSubmit|script|doDelete)");
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
