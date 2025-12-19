@@ -1,5 +1,6 @@
 package com.splunk.splunkjenkins.console;
 
+import com.splunk.splunkjenkins.SplunkJenkinsInstallation;
 import com.splunk.splunkjenkins.utils.RemoteUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jenkins.util.JenkinsJVM;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 public class SplunkConsoleTaskListenerDecorator extends TaskListenerDecorator {
     private static final long serialVersionUID = 1L;
+    private static final boolean ENABLE_REMOTE_DECORATOR = Boolean.parseBoolean(System.getProperty("splunkins.enableRemoteTaskListenerDecorator", "true"));
     @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
     transient PipelineConsoleDecoder decoder;
     // it is optional but not use Optional<Map> since Optional is not serializable
@@ -22,6 +24,9 @@ public class SplunkConsoleTaskListenerDecorator extends TaskListenerDecorator {
     public SplunkConsoleTaskListenerDecorator(WorkflowRun run) {
         this.decoder = new PipelineConsoleDecoder(run);
         this.source = run.getUrl() + "console";
+        if (ENABLE_REMOTE_DECORATOR) {
+            setRemoteSplunkinsConfig(SplunkJenkinsInstallation.get().toMap());
+        }
     }
 
     @NonNull
@@ -43,7 +48,7 @@ public class SplunkConsoleTaskListenerDecorator extends TaskListenerDecorator {
         return new LabelConsoleLineStream(outputStream, source, decoder);
     }
 
-    protected void setRemoteSplunkinsConfig(Map remoteSplunkinsConfig) {
+    private void setRemoteSplunkinsConfig(Map remoteSplunkinsConfig) {
         this.remoteSplunkinsConfig = remoteSplunkinsConfig;
     }
 }
