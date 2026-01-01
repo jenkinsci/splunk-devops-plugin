@@ -23,18 +23,13 @@ import static com.splunk.splunkjenkins.model.EventType.CONSOLE_LOG;
 @Extension(optional = true)
 public class SplunkTaskListenerFactory implements TaskListenerDecorator.Factory {
     private static final Logger LOGGER = Logger.getLogger(SplunkConsoleTaskListenerDecorator.class.getName());
-    private static final boolean ENABLE_REMOTE_DECORATOR = Boolean.parseBoolean(System.getProperty("splunkins.enableRemoteTaskListenerDecorator", "true"));
     private static final transient LoadingCache<WorkflowRun, SplunkConsoleTaskListenerDecorator> cachedDecorator = CacheBuilder.newBuilder()
             .weakKeys()
             .maximumSize(1024)
             .build(new CacheLoader<WorkflowRun, SplunkConsoleTaskListenerDecorator>() {
                 @Override
                 public SplunkConsoleTaskListenerDecorator load(WorkflowRun key) {
-                    SplunkConsoleTaskListenerDecorator decorator = new SplunkConsoleTaskListenerDecorator(key);
-                    if (ENABLE_REMOTE_DECORATOR) {
-                        decorator.setRemoteSplunkinsConfig(SplunkJenkinsInstallation.get().toMap());
-                    }
-                    return decorator;
+                    return new SplunkConsoleTaskListenerDecorator(key);
                 }
             });
 
