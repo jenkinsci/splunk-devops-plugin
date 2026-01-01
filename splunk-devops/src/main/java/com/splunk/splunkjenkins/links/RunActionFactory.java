@@ -9,9 +9,10 @@ import hudson.model.Run;
 import jenkins.model.TransientActionFactory;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.File;
+
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @SuppressWarnings("unused")
 @Extension
@@ -33,8 +34,7 @@ public class RunActionFactory extends TransientActionFactory<Run> {
         LogEventHelper.UrlQueryBuilder builder = new LogEventHelper.UrlQueryBuilder()
                 .putIfAbsent("job", job.getFullName())
                 .putIfAbsent("build", target.getNumber() + "");
-        File junitFile = new File(target.getRootDir(), "junitResult.xml");
-        if (junitFile.exists() || job.getClass().getName().startsWith("hudson.maven.")) {
+        if (job.getClass().getName().startsWith("hudson.maven.") || hasTestAction(target)) {
             // test page is using master query param instead of host
             builder.putIfAbsent("master", SplunkJenkinsInstallation.get().getMetadataHost());
             String query = builder.build();
@@ -43,5 +43,18 @@ public class RunActionFactory extends TransientActionFactory<Run> {
         String query = builder.putIfAbsent("type", "build")
                 .putIfAbsent("host", SplunkJenkinsInstallation.get().getMetadataHost()).build();
         return Collections.singleton(new LinkSplunkAction("build", query, "Splunk"));
+    }
+
+    private boolean hasTestAction(Run run) {
+        List<? extends Action> actionList = run.getAllActions();
+        for (Action action : actionList) {
+            String actionName = action.getClass().getName();
+            // can be junit AggregatedTestResultAction or TestResultAction or TestNGTestResultBuildAction
+            if ("hudson.tasks.junit.TestResultAction".equals(actionName) || "hudson.tasks.junit.TestResultAction".equals(actionName)
+                    || "hudson.plugins.testng.TestNGTestResultBuildAction".equals(actionName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
