@@ -46,7 +46,9 @@ public class RunActionFactory extends TransientActionFactory<Run> {
     }
 
     private boolean hasTestAction(Run run) {
-        List<? extends Action> actionList = run.getAllActions();
+        // can not use run.getAllActions which triggers createFor and causes infinite loop.
+        // has to use Deprecated method run.getActions
+        List<? extends Action> actionList = run.getActions();
         for (Action action : actionList) {
             String actionName = action.getClass().getName();
             // can be junit AggregatedTestResultAction or TestResultAction or TestNGTestResultBuildAction
