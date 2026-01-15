@@ -52,7 +52,7 @@ public class RunActionFactory extends TransientActionFactory<Run> {
         for (Action action : actionList) {
             String actionName = action.getClass().getName();
             // can be junit AggregatedTestResultAction or TestResultAction or TestNGTestResultBuildAction
-            if ("hudson.tasks.junit.TestResultAction".equals(actionName) || "hudson.tasks.junit.TestResultAction".equals(actionName)
+            if ("hudson.tasks.test.AggregatedTestResultAction".equals(actionName) || "hudson.tasks.junit.TestResultAction".equals(actionName)
                     || "hudson.plugins.testng.TestNGTestResultBuildAction".equals(actionName)) {
                 return true;
             }
