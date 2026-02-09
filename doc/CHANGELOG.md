@@ -1,3 +1,8 @@
+### 1.11.2 (Feb 9, 2026)
+- JENKINS-76340 check if it should enable remote decorator for all SplunkConsoleTaskListenerDecorator objects, thanks to [Marina Mota](https://github.com/marinamota18)
+- override RunActionFactory.actionType, thanks to [Jesse Glick](https://github.com/jglick)
+- add createSubmit to audit trail filter pattern, thanks to [Bertrand](https://github.com/bquenin)
+
 ### 1.11.1 (Nov 5, 2025)
 - remove org.apache.commons.lang and Util.XS_DATETIME_FORMATTE dependency because upstream will remove them, thanks to [Markus Winter](https://github.com/mawinter69)
 
