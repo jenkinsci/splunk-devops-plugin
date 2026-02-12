@@ -4,8 +4,20 @@ import hudson.console.ConsoleNote;
 
 import java.io.ByteArrayOutputStream;
 
+/**
+ * Utilities for decoding Jenkins console output by removing annotations.
+ */
 public class PlainTextConsoleUtils {
 
+    /**
+     * Finds the index of a byte pattern within a byte array
+     *
+     * @param buf the byte array to search
+     * @param start the starting index for the search
+     * @param end the ending index for the search
+     * @param matches the byte pattern to find
+     * @return the index of the pattern, or -1 if not found
+     */
     public static int arrayIndexOf(byte[] buf, int start, int end, byte[] matches) {
         int e = end - matches.length + 1;
 

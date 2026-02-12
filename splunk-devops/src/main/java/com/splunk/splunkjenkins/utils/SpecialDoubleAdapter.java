@@ -8,7 +8,11 @@ import shaded.splk.com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
 
+/**
+ * Gson TypeAdapter for handling special double values (NaN, Infinity).
+ */
 public class SpecialDoubleAdapter extends TypeAdapter<Double> {
+    /** {@inheritDoc} */
     @Override
     public void write(JsonWriter jsonWriter, Double number) throws IOException {
         if (number == null || Double.isNaN(number) || Double.isInfinite(number)) {
@@ -18,6 +22,7 @@ public class SpecialDoubleAdapter extends TypeAdapter<Double> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Double read(JsonReader in) throws IOException {
         if (in.peek() == JsonToken.NULL) {

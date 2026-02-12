@@ -22,6 +22,10 @@ import java.util.logging.Logger;
 
 import static com.splunk.splunkjenkins.utils.LogEventHelper.buildPost;
 
+/**
+ * Worker thread that consumes log events from the queue and sends them to Splunk.
+ * Handles retries, errors, and connection management for HTTP Event Collector.
+ */
 public class LogConsumer extends Thread {
     private static final Logger LOG = Logger.getLogger(LogConsumer.class.getName());
     private static final int retryInterval = Integer.parseInt(System.getProperty("splunk-retryinterval", "15"));
@@ -38,6 +42,13 @@ public class LogConsumer extends Thread {
             SplunkClientError.class);
     // Create a custom response handler
     private ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
+        /**
+         * Handles the HTTP response from Splunk and processes the result
+         *
+         * @param response the HTTP response from Splunk
+         * @return the response body as a string, or null if no entity
+         * @throws IOException if the response indicates an error
+         */
         @Override
         public String handleResponse(
                 final HttpResponse response) throws IOException {
@@ -70,6 +81,13 @@ public class LogConsumer extends Thread {
         }
     };
 
+    /**
+     * Constructs a LogConsumer worker thread
+     *
+     * @param client the HTTP client
+     * @param queue the blocking queue for event records
+     * @param counter the counter for outgoing events
+     */
     public LogConsumer(HttpClient client, BlockingQueue<EventRecord> queue, AtomicLong counter) {
         this.client = client;
         this.queue = queue;
@@ -77,6 +95,7 @@ public class LogConsumer extends Thread {
         this.outgoingCounter = counter;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void run() {
         while (acceptingTask) {
@@ -133,6 +152,9 @@ public class LogConsumer extends Thread {
         }
     }
 
+    /**
+     * Stops the LogConsumer worker thread gracefully
+     */
     public void stopTask() {
         this.acceptingTask = false;
         for (int i = 0; i < 5; i++) {
@@ -151,8 +173,11 @@ public class LogConsumer extends Thread {
     }
 
     /**
-     * @param record
-     * @throws InterruptedException
+     * Retries sending an event after a failure
+     *
+     * @param record the event record to retry
+     * @param sleepIntervalInSeconds the sleep interval in seconds before retrying
+     * @throws InterruptedException if the thread is interrupted
      */
     private void retry(EventRecord record, int sleepIntervalInSeconds) throws InterruptedException {
         //try bump error count
@@ -170,21 +195,40 @@ public class LogConsumer extends Thread {
         }
     }
 
+    /**
+     * Exception for Splunk client errors (authentication, authorization, bad request, etc.)
+     */
     public static class SplunkClientError extends IOException {
         int status;
 
+        /**
+         * Constructs a SplunkClientError with the given message and status code
+         *
+         * @param message the error message
+         * @param status the HTTP status code
+         */
         public SplunkClientError(String message, int status) {
             super(message + ", status code:" + status);
             this.status = status;
         }
     }
 
+    /**
+     * Exception for Splunk service errors (server busy, service unavailable, etc.)
+     */
     public static class SplunkServiceError extends IOException {
+        /**
+         * Constructs a SplunkServiceError with the given message and status code
+         *
+         * @param message the error message
+         * @param status the HTTP status code
+         */
         public SplunkServiceError(String message, int status) {
             super(message);
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return "LogConsumer{ errors=" + errorCount +

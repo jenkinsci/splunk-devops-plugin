@@ -10,21 +10,31 @@ import hudson.security.PermissionScope;
 import jenkins.model.Jenkins;
 
 @SuppressWarnings("unused")
+/**
+ * Jenkins root action that provides Splunk reporting links in the Jenkins UI
+ * Adds menu links for accessing Splunk dashboards and reports from Jenkins
+ */
 @Extension
 public class ReportAction implements RootAction {
 
     /**
      * Permission group for Splunk Link related permissions.
+     * <p>
+     * Groups all permissions related to Splunk link functionality.
      */
     public static final PermissionGroup PERMISSIONS =
             new PermissionGroup(ReportAction.class, Messages._PermissionGroup());
     /**
-     * Permission to get the Splunk link displayed.
+     * Permission to view and access Splunk dashboard links.
+     * <p>
+     * Controls whether users can see Splunk links in the Jenkins UI and
+     * access the Splunk reporting dashboards.
      */
     public static final Permission SPLUNK_LINK = new Permission(PERMISSIONS,
             "SplunkLink", Messages._PluginViewPermission_Description(), Jenkins.ADMINISTER, PermissionScope.JENKINS);
 
 
+    /** {@inheritDoc} */
     @Override
     public String getIconFileName() {
         if (Jenkins.getInstance().hasPermission(ReportAction.SPLUNK_LINK)){
@@ -33,6 +43,7 @@ public class ReportAction implements RootAction {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getDisplayName() {
         if (Jenkins.getInstance().hasPermission(ReportAction.SPLUNK_LINK)){
@@ -41,6 +52,7 @@ public class ReportAction implements RootAction {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getUrlName() {
         if (Jenkins.getInstance().hasPermission(ReportAction.SPLUNK_LINK)){

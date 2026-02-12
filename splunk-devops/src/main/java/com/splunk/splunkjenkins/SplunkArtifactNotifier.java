@@ -21,6 +21,10 @@ import java.util.logging.Logger;
 import static com.splunk.splunkjenkins.utils.LogEventHelper.parseFileSize;
 import static com.splunk.splunkjenkins.utils.LogEventHelper.sendFiles;
 
+/**
+ * Jenkins build step that sends build artifacts to Splunk.
+ * Allows configurable file patterns, size limits, and publishing options.
+ */
 @SuppressWarnings("unused")
 public class SplunkArtifactNotifier extends Notifier implements SimpleBuildStep {
     /**
@@ -32,6 +36,15 @@ public class SplunkArtifactNotifier extends Notifier implements SimpleBuildStep 
     private final boolean skipGlobalSplunkArchive;
     private final String sizeLimit;
 
+    /**
+     * Constructs a SplunkArtifactNotifier with file patterns and configuration options
+     *
+     * @param includeFiles the file pattern for files to include (Ant-style glob)
+     * @param excludeFiles the file pattern for files to exclude (Ant-style glob)
+     * @param publishFromSlave whether to publish files from slave nodes
+     * @param skipGlobalSplunkArchive whether to skip global Splunk archive settings
+     * @param sizeLimit the maximum file size limit (e.g., "10MB", "5GB")
+     */
     @DataBoundConstructor
     public SplunkArtifactNotifier(String includeFiles, String excludeFiles, boolean publishFromSlave,
                                   boolean skipGlobalSplunkArchive, String sizeLimit) {
@@ -42,11 +55,20 @@ public class SplunkArtifactNotifier extends Notifier implements SimpleBuildStep 
         this.sizeLimit=sizeLimit;
     }
 
+    /** {@inheritDoc} */
     @Override
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * Main execution method that sends build artifacts to Splunk based on configured
+     * file patterns and size limits. The method resolves file patterns using Ant-style
+     * glob syntax, respects include/exclude filters, and sends matching files to Splunk
+     * via the HTTP Event Collector.
+     */
     @Override
     public void perform(@NonNull Run<?, ?> build, @NonNull FilePath workspace,
                            @NonNull Launcher launcher, @NonNull TaskListener listener) throws InterruptedException, IOException {
@@ -62,6 +84,9 @@ public class SplunkArtifactNotifier extends Notifier implements SimpleBuildStep 
         Logger.getLogger(this.getClass().getName()).log(Level.FINE,"sent "+eventCount+" events with file size limit "+maxFileSize);
     }
 
+    /**
+     * Descriptor for SplunkArtifactNotifier that provides UI labels and applicability
+     */
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
         @Override
@@ -74,6 +99,7 @@ public class SplunkArtifactNotifier extends Notifier implements SimpleBuildStep 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return "SplunkArtifactNotifier{" +
@@ -85,22 +111,47 @@ public class SplunkArtifactNotifier extends Notifier implements SimpleBuildStep 
                 '}';
     }
 
+    /**
+     * Gets the file pattern for files to include
+     *
+     * @return the include files pattern
+     */
     public String getIncludeFiles() {
         return includeFiles;
     }
 
+    /**
+     * Gets the file pattern for files to exclude
+     *
+     * @return the exclude files pattern
+     */
     public String getExcludeFiles() {
         return excludeFiles;
     }
 
+    /**
+     * Checks whether to publish files from slave nodes
+     *
+     * @return true if publishing from slave nodes
+     */
     public boolean isPublishFromSlave() {
         return publishFromSlave;
     }
 
+    /**
+     * Checks whether to skip global Splunk archive settings
+     *
+     * @return true if skipping global archive settings
+     */
     public boolean isSkipGlobalSplunkArchive() {
         return skipGlobalSplunkArchive;
     }
 
+    /**
+     * Gets the maximum file size limit
+     *
+     * @return the size limit (e.g., "10MB", "5GB")
+     */
     public String getSizeLimit() {
         return sizeLimit;
     }

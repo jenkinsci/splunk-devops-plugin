@@ -19,6 +19,10 @@ import java.util.logging.Formatter;
 import static com.splunk.splunkjenkins.Constants.JDK_FINE_LOG_BATCH;
 
 
+/**
+ * Custom Java logging handler that forwards Jenkins logs to Splunk.
+ * Captures log records, formats them, and sends to Splunk via HTTP Event Collector.
+ */
 public class JdkSplunkLogHandler extends Handler {
     private Lock maintenanceLock = new ReentrantLock();
 
@@ -26,12 +30,16 @@ public class JdkSplunkLogHandler extends Handler {
     private Level filterLevel = Level.parse(System.getProperty(JdkSplunkLogHandler.class.getName() + ".level", "INFO"));
     private LogEventFormatter splunkFormatter;
 
+    /**
+     * Constructs a JdkSplunkLogHandler for capturing JDK log records
+     */
     public JdkSplunkLogHandler() {
         this.splunkFormatter = new LogEventFormatter();
         setFilter(new LogFilter());
         setLevel(filterLevel);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void publish(LogRecord record) {
         if (!SplunkJenkinsInstallation.isLogHandlerRegistered()) {
@@ -61,6 +69,7 @@ public class JdkSplunkLogHandler extends Handler {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     public void flush() {
         if (this.verboseLogCache.isEmpty()) {
@@ -77,6 +86,7 @@ public class JdkSplunkLogHandler extends Handler {
         SplunkLogService.getInstance().sendBatch(copyList, EventType.LOG);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() throws SecurityException {
 
@@ -149,12 +159,20 @@ public class JdkSplunkLogHandler extends Handler {
         }
     }
 
+    /**
+     * Holder class for managing log handler on slave nodes
+     */
     public static final class LogHolder {
         /**
          * This field is used on each slave node to record log records on the slave.
          */
         static final JdkSplunkLogHandler LOG_HANDLER = new JdkSplunkLogHandler();
 
+        /**
+         * Retrieves and publishes log records from a slave computer
+         *
+         * @param computer the slave computer to retrieve logs from
+         */
         public static void getSlaveLog(Computer computer) {
             if (computer == null || computer instanceof Jenkins.MasterComputer) {
                 return;

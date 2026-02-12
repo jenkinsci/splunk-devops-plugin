@@ -13,10 +13,22 @@ import java.util.logging.Logger;
 
 import static hudson.init.InitMilestone.JOB_LOADED;
 
+/**
+ * Initializes the Splunk Jenkins plugin during Jenkins startup.
+ * Registers the custom log handler and web access logger.
+ */
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings("LG_LOST_LOGGER_DUE_TO_WEAK_REFERENCE")
 public class LoggingInitStep {
     private final static String rootLoggerName = "";
 
+    /**
+     * Scheduled initialization method that registers the Splunk log handler
+     * 30 seconds after Jenkins job loading completes. This delay ensures
+     * all plugins are properly initialized before setting up Splunk integration.
+     *
+     * This method is called automatically by Jenkins through the @Initializer
+     * annotation and should not be invoked directly.
+     */
     @Initializer(after = JOB_LOADED)
     public static void setupSplunkJenkins() {
         Timer.get().schedule(new Runnable() {
@@ -27,6 +39,12 @@ public class LoggingInitStep {
         }, 30, TimeUnit.SECONDS);
     }
 
+    /**
+     * Registers the JDK Splunk log handler with the root logger, initializes
+     * the Splunk plugin configuration, and sets up web access logging if enabled.
+     * This method checks for duplicate handlers and configures appropriate
+     * log levels for the health monitor.
+     */
     protected static void registerHandler() {
         Handler[] handlers = Logger.getLogger(rootLoggerName).getHandlers();
         for (Handler handler : handlers) {

@@ -26,6 +26,10 @@ import static com.splunk.splunkjenkins.Constants.*;
 import static com.splunk.splunkjenkins.model.EventType.BUILD_EVENT;
 import static com.splunk.splunkjenkins.utils.LogEventHelper.*;
 
+/**
+ * Listens for Jenkins build/run events and sends build information to Splunk.
+ * Tracks build start, completion, test results, coverage metrics, and SCM changes.
+ */
 @SuppressWarnings("unused")
 @Extension
 public class LoggingRunListener extends RunListener<Run> {
@@ -34,6 +38,7 @@ public class LoggingRunListener extends RunListener<Run> {
 
     UserActionDSL postJobAction = new UserActionDSL();
 
+    /** {@inheritDoc} */
     @Override
     public void onStarted(Run run, TaskListener listener) {
         if (SplunkJenkinsInstallation.get().isEventDisabled(BUILD_EVENT) ||
@@ -51,6 +56,7 @@ public class LoggingRunListener extends RunListener<Run> {
         updateSlaveInfoAsync((String) event.get(NODE_NAME_KEY));
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onCompleted(Run run, @NonNull TaskListener listener) {
         if (SplunkJenkinsInstallation.get().isEventDisabled(BUILD_EVENT) ||
@@ -120,9 +126,14 @@ public class LoggingRunListener extends RunListener<Run> {
     }
 
     /**
-     * @param run Jenkins build run
-     * @return Build event which are common both to start/complete event
-     * should not reference some fields only available after build such as result or duration
+     * Collects common build information for both started and completed events,
+     * including build parameters, node information, triggers, SCM details,
+     * and queue time. This method should not reference fields that are only
+     * available after build completion.
+     *
+     * @param run Jenkins job run
+     * @param completed whether the build has completed
+     * @return Map containing common build metadata
      */
     private Map<String, Object> getCommonBuildInfo(Run run, boolean completed) {
         Map<String, Object> event = new HashMap();
@@ -177,7 +188,9 @@ public class LoggingRunListener extends RunListener<Run> {
     }
 
     /**
-     * Send audit information
+     * Sends audit information when a build is aborted by a user.
+     * Queries the InterruptedBuildAction to determine which user stopped
+     * the build and logs it to Splunk.
      *
      * @param run Jenkins job run
      */

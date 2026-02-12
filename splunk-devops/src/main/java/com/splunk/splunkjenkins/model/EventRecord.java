@@ -13,6 +13,10 @@ import java.util.Map;
 import static com.splunk.splunkjenkins.Constants.EVENT_SOURCE_TYPE;
 import static com.splunk.splunkjenkins.model.EventType.CONSOLE_LOG;
 
+/**
+ * Represents a log event to be sent to Splunk.
+ * Contains the event message, type, timestamp, and metadata for HTTP Event Collector.
+ */
 public class EventRecord {
     private final static String METADATA_KEYS[] = {"index", "source", EVENT_SOURCE_TYPE};
     private final static String MESSAGE_CLEARED = "error: message was cleared for memory demand by garbage collector";
@@ -22,6 +26,12 @@ public class EventRecord {
     private EventType eventType;
     private String source;
 
+    /**
+     * Creates a new EventRecord with the specified message and event type
+     *
+     * @param message the message content
+     * @param eventType the type of event
+     */
     public EventRecord(Object message, EventType eventType) {
         this.retryCount = 0;
         if (eventType == null) {
@@ -36,10 +46,22 @@ public class EventRecord {
         this.message = message;
     }
 
+    /**
+     * Increments the retry count when a log event fails to send to Splunk.
+     * This is called by LogConsumer when an event fails to send and needs
+     * to be retried.
+     */
     public void increase() {
         this.retryCount++;
     }
 
+    /**
+     * Determines if an event should be discarded after exceeding maximum
+     * retry attempts. Events that exceed the retry limit are not sent to
+     * Splunk to prevent infinite loops.
+     *
+     * @return true if event should be discarded, false if it can still be retried
+     */
     public boolean isDiscarded() {
         try {
             return retryCount > SplunkJenkinsInstallation.get().getMaxRetries();
@@ -49,14 +71,29 @@ public class EventRecord {
         }
     }
 
+    /**
+     * Gets the timestamp of when this event was created
+     *
+     * @return the event time in milliseconds
+     */
     public long getTime() {
         return time;
     }
 
+    /**
+     * Sets the timestamp for this event
+     *
+     * @param time the event time in milliseconds
+     */
     public void setTime(long time) {
         this.time = time;
     }
 
+    /**
+     * Gets the message content, handling SoftReference-based messages
+     *
+     * @return the message content
+     */
     @NonNull
     public Object getMessage() {
         if (message instanceof SoftReference) {
@@ -70,6 +107,13 @@ public class EventRecord {
         }
     }
 
+    /**
+     * Retrieves the event message as a string, handling SoftReference-based
+     * messages that may have been garbage collected under memory pressure.
+     *
+     * @return the message content or a "message was cleared" indicator
+     */
+    @NonNull
     public String getMessageString() {
         return getMessage().toString();
     }
@@ -79,6 +123,8 @@ public class EventRecord {
     }
 
     /**
+     * <p>getShortDescription.</p>
+     *
      * @return short message, to be showed in debug message
      */
     public String getShortDescription() {
@@ -91,19 +137,36 @@ public class EventRecord {
         }
     }
 
+    /**
+     * Gets the timestamp of the event as a formatted string
+     *
+     * @return the formatted timestamp string
+     */
     public String getTimestamp() {
         return String.format(Locale.US, "%.3f", time / 1000d);
     }
 
+    /**
+     * Gets the source of the event
+     *
+     * @return the source identifier
+     */
     public String getSource() {
         return source;
     }
 
+    /**
+     * Sets the source of the event
+     *
+     * @param source the source identifier
+     */
     public void setSource(String source) {
         this.source = source;
     }
 
     /**
+     * <p>Getter for the field <code>eventType</code>.</p>
+     *
      * @return the event type
      */
     @NonNull
@@ -140,6 +203,8 @@ public class EventRecord {
     }
 
     /**
+     * <p>getRawEndpoint.</p>
+     *
      * @param config the Splunk config which contains metadata information
      * @return the http event collector endpoint
      */
@@ -150,6 +215,8 @@ public class EventRecord {
     }
 
     /**
+     * <p>toMap.</p>
+     *
      * @param config the Splunk config which contains metadata information
      * @return a Map object can be used for json serialization
      */
@@ -162,6 +229,11 @@ public class EventRecord {
         return values;
     }
 
+    /**
+     * Checks if the event has been attempted and failed at least once.
+     *
+     * @return true if the event has failed (retry count > 0), false otherwise
+     */
     public boolean isFailed() {
         return retryCount > 0;
     }

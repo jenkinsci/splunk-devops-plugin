@@ -7,7 +7,11 @@ import shaded.splk.com.google.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
 
+/**
+ * JSON serializer for coverage detail reports.
+ */
 public class CoverageDetailJsonSerializer implements JsonSerializer<CoverageMetricsAdapter.CoverageDetail> {
+    /** {@inheritDoc} */
     @Override
     public JsonElement serialize(CoverageMetricsAdapter.CoverageDetail coverageDetail, Type type,
                                  JsonSerializationContext jsonSerializationContext) {

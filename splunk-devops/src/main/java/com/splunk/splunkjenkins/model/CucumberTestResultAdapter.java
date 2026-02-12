@@ -12,8 +12,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Adapts Cucumber BDD test results for Splunk reporting.
+ */
 @Extension(optional = true)
 public class CucumberTestResultAdapter extends AbstractTestResultAdapter<CucumberTestResultAction> {
+
+    /** {@inheritDoc} */
     @Override
     public List<TestCaseResult> getTestResult(CucumberTestResultAction resultAction) {
         List<TestCaseResult> caseResults = new ArrayList<>();
@@ -45,9 +50,11 @@ public class CucumberTestResultAdapter extends AbstractTestResultAdapter<Cucumbe
     }
 
     /**
-     * @param testResult bdd test result
-     * @param className  bdd test scenario name
-     * @return
+     * Converts a Cucumber test result to a TestCaseResult
+     *
+     * @param testResult the BDD test result
+     * @param className  the BDD test scenario name
+     * @return the converted test case result
      */
     private TestCaseResult convert(TestResult testResult, String className) {
         TestCaseResult testCaseResult = new TestCaseResult();
@@ -74,6 +81,12 @@ public class CucumberTestResultAdapter extends AbstractTestResultAdapter<Cucumbe
         return testCaseResult;
     }
 
+    /**
+     * Updates the error details from the test result
+     *
+     * @param testResult the test result containing error information
+     * @param testCaseResult the test case result to update
+     */
     private void updateErrorDetails(TestResult testResult, TestCaseResult testCaseResult) {
         try {
             Result result = (Result) FieldUtils.readField(testResult, "result", true);
@@ -94,6 +107,12 @@ public class CucumberTestResultAdapter extends AbstractTestResultAdapter<Cucumbe
         }
     }
 
+    /**
+     * Gets the step name from a step result
+     *
+     * @param stepResult the step result
+     * @return the step name including keyword
+     */
     private String getStepName(StepResult stepResult) {
         String stepName = "";
         try {

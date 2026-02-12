@@ -59,12 +59,27 @@ public class CoberturaCoverageMetrics extends CoverageMetricsAdapter<CoberturaBu
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * Generates a detailed coverage report from the Cobertura coverage action.
+     * <p>
+     * Creates a hierarchical coverage report including project-level summary,
+     * package-level metrics, file-level details, and class-level data.
+     */
     @Override
     public List<CoverageDetail> getReport(CoberturaBuildAction coverageAction) {
         CoverageResult coverageResult = coverageAction.getResult();
         return getReport(coverageResult, "");
     }
 
+    /**
+     * Recursively generates a coverage report from a CoverageResult.
+     *
+     * @param coverage the coverage result to generate a report for
+     * @param prefix the prefix to use for coverage names
+     * @return a list of coverage details
+     */
     private List<CoverageDetail> getReport(CoverageResult coverage, String prefix) {
         List<CoverageDetail> report = new ArrayList<>();
         CoverageLevel level;

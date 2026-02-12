@@ -40,7 +40,14 @@ import java.util.logging.Level;
 
 import static com.splunk.splunkjenkins.model.EventType.BATCH_JSON;
 
+/**
+ * <p>SplunkLogService class.</p>
+ *
+ */
 public class SplunkLogService {
+    /**
+     * Logger instance for SplunkLogService
+     */
     public static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(SplunkLogService.class.getName());
     private static final boolean VERIFY_SSL = Boolean.getBoolean("splunkins.verifySSL");
     private final static int SOCKET_TIMEOUT = 3;
@@ -80,6 +87,11 @@ public class SplunkLogService {
             .build();
     }
 
+    /**
+     * <p>getInstance.</p>
+     *
+     * @return a {@link com.splunk.splunkjenkins.utils.SplunkLogService} object.
+     */
     public static SplunkLogService getInstance() {
         return InstanceHolder.service;
     }
@@ -120,6 +132,8 @@ public class SplunkLogService {
     }
 
     /**
+     * <p>send.</p>
+     *
      * @param message the message to send
      * @return true if enqueue successfully, false if the message is discarded
      */
@@ -132,6 +146,8 @@ public class SplunkLogService {
     }
 
     /**
+     * <p>send.</p>
+     *
      * @param message    the message to send
      * @param sourceName the source for splunk metadata
      * @return true if enqueue successfully, false if the message is discarded
@@ -141,6 +157,8 @@ public class SplunkLogService {
     }
 
     /**
+     * <p>send.</p>
+     *
      * @param message   the message to send, will use CONSOLE_LOG's config
      * @param eventType the type of event, @see EventType
      * @return true if enqueue successfully, false if the message is discarded
@@ -150,6 +168,8 @@ public class SplunkLogService {
     }
 
     /**
+     * <p>sendBatch.</p>
+     *
      * @param messages  the messages to send
      * @param eventType the type of event, @see EventType
      * @return true if enqueue successfully, false if some message are discarded
@@ -189,6 +209,8 @@ public class SplunkLogService {
     }
 
     /**
+     * <p>send.</p>
+     *
      * @param message    the message to send
      * @param eventType  the type of event, @see EventType
      * @param sourceName the source for splunk metadata
@@ -212,6 +234,12 @@ public class SplunkLogService {
         return enqueue(record);
     }
 
+    /**
+     * <p>enqueue.</p>
+     *
+     * @param record a {@link com.splunk.splunkjenkins.model.EventRecord} object.
+     * @return a boolean.
+     */
     public boolean enqueue(EventRecord record) {
         if (SplunkJenkinsInstallation.get().isEventDisabled(record.getEventType())) {
             LOG.log(Level.FINE, "config invalid or eventType {0} is disabled, can not send {1}", new String[]{record.getEventType().toString(), record.getShortDescription()});
@@ -293,6 +321,9 @@ public class SplunkLogService {
         }
     }
 
+    /**
+     * <p>stopWorker.</p>
+     */
     public void stopWorker() {
         synchronized (workers) {
             for (LogConsumer consumer : workers) {
@@ -307,18 +338,36 @@ public class SplunkLogService {
         }
     }
 
+    /**
+     * <p>releaseConnection.</p>
+     */
     public void releaseConnection() {
         connMgr.closeIdleConnections(0, TimeUnit.SECONDS);
     }
 
+    /**
+     * <p>getSentCount.</p>
+     *
+     * @return a long.
+     */
     public long getSentCount() {
         return outgoingCounter.get();
     }
 
+    /**
+     * <p>getQueueSize.</p>
+     *
+     * @return a long.
+     */
     public long getQueueSize() {
         return this.logQueue.size();
     }
 
+    /**
+     * <p>Getter for the field <code>client</code>.</p>
+     *
+     * @return a {@link shaded.splk.org.apache.http.client.HttpClient} object.
+     */
     public HttpClient getClient() {
         return client;
     }
@@ -340,6 +389,11 @@ public class SplunkLogService {
         }
     }
 
+    /**
+     * <p>getStats.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getStats() {
         StringBuilder sbr = new StringBuilder();
         sbr.append("remaining:").append(this.getQueueSize()).append(" ")

@@ -15,8 +15,16 @@ import java.util.List;
 
 import static com.splunk.splunkjenkins.Constants.ERROR_MESSAGE_NA;
 
+/**
+ * Adapts TestNG test results for Splunk reporting.
+ */
 @Extension(optional = true)
 public class TestNGResultAdapter extends AbstractTestResultAdapter<TestNGTestResultBuildAction> {
+    /**
+     * {@inheritDoc}
+     *
+     * Gets the test results from a TestNG test result action
+     */
     @Override
     public List<TestCaseResult> getTestResult(TestNGTestResultBuildAction resultAction) {
         String buildUrl = "";
@@ -78,10 +86,11 @@ public class TestNGResultAdapter extends AbstractTestResultAdapter<TestNGTestRes
     }
 
     /**
-     * If this test failed, then return the build number
-     * when this test started failing.
+     * If this test failed, returns the build number when this test started failing
      *
-     * @return the build number when this test started failing.
+     * @param b the current run
+     * @param id the test method ID
+     * @return the build number when this test started failing
      */
     private int getFailedSince(Run b, String id) {
         int i = 0;

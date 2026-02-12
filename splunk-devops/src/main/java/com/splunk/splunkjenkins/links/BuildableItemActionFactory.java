@@ -13,14 +13,25 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Collection;
 import java.util.Collections;
 
+/**
+ * Factory that adds Splunk links to buildable Jenkins items.
+ */
 @SuppressWarnings("unused")
 @Extension
 public class BuildableItemActionFactory extends TransientActionFactory<BuildableItem> {
+    /** {@inheritDoc} */
     @Override
     public Class<BuildableItem> type() {
         return BuildableItem.class;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * Creates Splunk link actions for a buildable Jenkins item.
+     * <p>
+     * Adds a generic Splunk build link to buildable items (jobs, projects, etc.).
+     */
     @NonNull
     @Override
     public Collection<? extends Action> createFor(@NonNull BuildableItem target) {

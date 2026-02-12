@@ -12,12 +12,22 @@ import java.net.Socket;
 
 import static com.splunk.splunkjenkins.utils.MultipleHostResolver.NAME_DELIMITER;
 
+/**
+ * Custom SSL socket factory that handles multiple comma-separated hostnames.
+ */
 public class CustomSSLConnectionSocketFactory extends SSLConnectionSocketFactory {
 
+    /**
+     * Constructs a CustomSSLConnectionSocketFactory
+     *
+     * @param sslContext the SSL context
+     * @param hostnameVerifier the hostname verifier
+     */
     public CustomSSLConnectionSocketFactory(SSLContext sslContext, HostnameVerifier hostnameVerifier) {
         super(sslContext, hostnameVerifier);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Socket connectSocket(int connectTimeout, Socket socket, HttpHost host, InetSocketAddress remoteAddress, InetSocketAddress localAddress, HttpContext context) throws IOException {
         if (host.getHostName().contains(NAME_DELIMITER)) {

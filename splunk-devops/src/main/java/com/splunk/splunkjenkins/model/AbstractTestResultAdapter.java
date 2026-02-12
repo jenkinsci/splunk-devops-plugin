@@ -17,11 +17,21 @@ import java.util.logging.Level;
 
 import static com.splunk.splunkjenkins.Constants.MAX_JUNIT_STDIO_SIZE;
 
+/**
+ * Abstract adapter for test results that can be extended to support different test frameworks.
+ * Provides a common interface for extracting test results from various Jenkins test actions.
+ */
 public abstract class AbstractTestResultAdapter<A extends AbstractTestResultAction> implements ExtensionPoint {
     private static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(AbstractTestResultAdapter.class.getName());
-
+    
+    /**
+     *  refelct class type which invoked for checking Run.getAction(targetType)
+     */
     public final Class<A> targetType;
 
+    /**
+     * Constructs an AbstractTestResultAdapter and determines the target action type
+     */
     public AbstractTestResultAdapter() {
         Type type = Types.getBaseClass(getClass(), AbstractTestResultAdapter.class);
         if (type instanceof ParameterizedType)
@@ -31,17 +41,31 @@ public abstract class AbstractTestResultAdapter<A extends AbstractTestResultActi
 
     }
 
+    /**
+     * Gets the test result action from the build
+     *
+     * @param run the Jenkins build
+     * @return the test result action
+     */
     public A getAction(Run run) {
         return run.getAction(targetType);
     }
 
+    /**
+     * Checks if this adapter is applicable to the given build
+     *
+     * @param build the Jenkins build
+     * @return true if the adapter is applicable, false otherwise
+     */
     public boolean isApplicable(Run build) {
         return getAction(build) != null;
     }
 
     /**
+     * Gets all test results from the build
+     *
      * @param build jenkins build
-     * @return all the test result added in the build
+     * @return all the test results added in the build
      */
     @NonNull
     public static List<TestResult> getTestResult(Run build) {
@@ -49,9 +73,11 @@ public abstract class AbstractTestResultAdapter<A extends AbstractTestResultActi
     }
 
     /**
+     * Gets test results from the build, optionally ignoring some test actions
+     *
      * @param build          jenkins build
-     * @param ignoredActions a list of test action class name
-     * @return the test result filtered by the test action name
+     * @param ignoredActions a list of test action class names to filter out
+     * @return the test results filtered by the test action name
      */
     @NonNull
     public static List<TestResult> getTestResult(Run build, @NonNull List<String> ignoredActions) {
@@ -70,8 +96,24 @@ public abstract class AbstractTestResultAdapter<A extends AbstractTestResultActi
         return testResults;
     }
 
+    /**
+     * Gets the test result from the result action
+     *
+     * @param resultAction the test result action
+     * @return a list of test results
+     */
     public abstract <T extends TestResult> List<T> getTestResult(A resultAction);
 
+    /**
+     * Truncates large test output messages to prevent excessive memory usage.
+     * When a message exceeds MAX_JUNIT_STDIO_SIZE, logs a warning with
+     * case name and build URL to help diagnose the large output source.
+     *
+     * @param message the test output message to process
+     * @param caseName test case name for warning logs
+     * @param url build URL for warning logs
+     * @return the original message if small enough, otherwise a truncated message
+     */
     public static String trimToLimit(String message, String caseName, String url) {
         String truncatedMessage = "...truncated";
         if (MAX_JUNIT_STDIO_SIZE < truncatedMessage.length() || message == null || message.length() <= MAX_JUNIT_STDIO_SIZE) {

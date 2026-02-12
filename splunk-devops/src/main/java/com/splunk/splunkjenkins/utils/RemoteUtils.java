@@ -6,8 +6,16 @@ import org.apache.commons.beanutils.BeanUtils;
 
 import java.util.Map;
 
+/**
+ * Utilities for initializing Splunk configuration on remote agents.
+ */
 public class RemoteUtils {
 
+    /**
+     * Initializes Splunk configuration on agent using configuration properties map
+     *
+     * @param eventCollectorProperty map containing Splunk configuration properties
+     */
     public static void initSplunkConfigOnAgent(Map eventCollectorProperty) {
         // Init SplunkJenkins global config in slave, can not reference Jenkins.getInstance(), Xtream
         SplunkJenkinsInstallation config = new SplunkJenkinsInstallation(false);
@@ -23,6 +31,11 @@ public class RemoteUtils {
 
     }
 
+    /**
+     * Initializes Splunk configuration on agent using a SplunkJenkinsInstallation instance
+     *
+     * @param instance the SplunkJenkinsInstallation instance
+     */
     public static void initSplunkConfigOnAgent(SplunkJenkinsInstallation instance) {
         SplunkJenkinsInstallation.initOnAgent(instance);
         // only use one thread on agent

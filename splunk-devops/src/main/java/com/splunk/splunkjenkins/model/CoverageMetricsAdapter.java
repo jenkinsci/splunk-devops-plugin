@@ -13,17 +13,24 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 /**
- * Extracts  Coverage metric
+ * Adapter for extracting code coverage metrics from various coverage plugins.
+ * Supports different coverage tools like JaCoCo, Clover, and Cobertura.
  *
  * @param <M> Coverage Action
  */
 public abstract class CoverageMetricsAdapter<M extends HealthReportingAction> implements ExtensionPoint {
+    /**
+     * The target action type that this adapter handles
+     */
     public final Class<M> targetType;
     static final String PERCENTAGE_SUFFIX = "_percentage";
     static final String TOTAL_SUFFIX = "_total";
     static final String COVERED_SUFFIX = "_covered";
 
 
+    /**
+     * Constructs a CoverageMetricsAdapter and determines the target action type
+     */
     public CoverageMetricsAdapter() {
         Type type = Types.getBaseClass(getClass(), CoverageMetricsAdapter.class);
         if (type instanceof ParameterizedType)
@@ -33,14 +40,32 @@ public abstract class CoverageMetricsAdapter<M extends HealthReportingAction> im
 
     }
 
+    /**
+     * Gets the coverage action from the build
+     *
+     * @param run the Jenkins build
+     * @return the coverage action
+     */
     public M getAction(Run run) {
         return run.getAction(targetType);
     }
 
+    /**
+     * Checks if this adapter is applicable to the given build
+     *
+     * @param build the Jenkins build
+     * @return true if the adapter is applicable, false otherwise
+     */
     public boolean isApplicable(Run build) {
         return getAction(build) != null;
     }
 
+    /**
+     * Gets coverage metrics from the first applicable adapter
+     *
+     * @param build the Jenkins build
+     * @return a map of coverage metrics to values
+     */
     @NonNull
     public static Map<Metric, Integer> getMetrics(Run build) {
         List<CoverageMetricsAdapter> adapters = ExtensionList.lookup(CoverageMetricsAdapter.class);
@@ -53,21 +78,27 @@ public abstract class CoverageMetricsAdapter<M extends HealthReportingAction> im
     }
 
     /**
-     * @param coverageAction coverage action
+     * Gets coverage metrics from the coverage action
+     *
+     * @param coverageAction the coverage action
      * @return coverage metrics, key is metric, value is percentage
      */
     public abstract Map<Metric, Integer> getMetrics(M coverageAction);
 
     /**
-     * @param coverageAction coverage action
-     * @return coverage report, key is filename, value is percentage
+     * Gets a detailed coverage report from the coverage action
+     *
+     * @param coverageAction the coverage action
+     * @return coverage report, a list of coverage details
      */
     public abstract List<CoverageDetail> getReport(M coverageAction);
 
     /**
-     * @param build    Jenkins build
+     * Gets a paginated coverage report from the first applicable adapter
+     *
+     * @param build Jenkins build
      * @param pageSize page size, <code>0</code> will disable pagination
-     * @return coverage report with no more than <code>pageSize</code>
+     * @return coverage report with no more than <code>pageSize</code> items per page
      */
     public static List<List<CoverageDetail>> getReport(Run build, int pageSize) {
         List<CoverageMetricsAdapter> adapters = ExtensionList.lookup(CoverageMetricsAdapter.class);
@@ -87,18 +118,53 @@ public abstract class CoverageMetricsAdapter<M extends HealthReportingAction> im
         }
     }
 
+    /**
+     * Enum representing different code coverage metrics
+     */
     public enum Metric {
+        /**
+         * Package-level coverage metrics
+         */
         PACKAGE("packages"),
+        /**
+         * File-level coverage metrics
+         */
         FILE("files"),
+        /**
+         * Class-level coverage metrics
+         */
         CLASS("classes"),
+        /**
+         * Method-level coverage metrics
+         */
         METHOD("methods"),
+        /**
+         * Conditional/branch coverage metrics
+         */
         CONDITIONAL("conditionals"),
+        /**
+         * Statement coverage metrics
+         */
         STATEMENT("statements"),
+        /**
+         * Line coverage metrics
+         */
         LINE("lines"),
+        /**
+         * Element coverage metrics
+         */
         ELEMENT("elements"),
-        //for Emma (JaCoCo plugin)
+        /**
+         * Complexity coverage metrics (for Emma/JaCoCo plugin)
+         */
         COMPLEXITY("complexity"),
+        /**
+         * Branch coverage metrics
+         */
         BRANCH("branches"),
+        /**
+         * Instruction coverage metrics
+         */
         INSTRUCTION("instructions");
 
 
@@ -130,33 +196,79 @@ public abstract class CoverageMetricsAdapter<M extends HealthReportingAction> im
     }
 
     /**
-     * used to trace which level coverage generated
+     * Used to indicate the level of coverage
      */
     public enum CoverageLevel {
-        PROJECT, PACKAGE, CLASS, METHOD, FILE
+        /**
+         * Project-level coverage
+         */
+        PROJECT,
+        /**
+         * Package-level coverage
+         */
+        PACKAGE,
+        /**
+         * Class-level coverage
+         */
+        CLASS,
+        /**
+         * Method-level coverage
+         */
+        METHOD,
+        /**
+         * File-level coverage
+         */
+        FILE
     }
 
+    /**
+     * Data structure for holding detailed coverage information
+     */
     public static class CoverageDetail {
         Map<String, Object> report = new HashMap<>();
 
+        /**
+         * Creates a CoverageDetail with the specified name
+         *
+         * @param name the coverage name
+         */
         public CoverageDetail(String name) {
             report.put("name", name);
         }
 
+        /**
+         * Creates a CoverageDetail with the specified name and level
+         *
+         * @param name the coverage name
+         * @param level the coverage level
+         */
         public CoverageDetail(String name, CoverageLevel level) {
             report.put("name", name);
             report.put("cov_level", level.toString().toLowerCase());
         }
 
+        /**
+         * Gets the coverage report as a map
+         *
+         * @return the coverage report map
+         */
         public Map<String, Object> getReport() {
             return report;
         }
 
+        /**
+         * Adds a metric value to the report
+         *
+         * @param metric the metric enum
+         * @param value the metric value
+         */
         public void add(Metric metric, int value) {
             report.put(metric.toString(), value);
         }
 
         /**
+         * Adds a metric value to the report by name
+         *
          * @param metric metric name, such as classes, methods
          * @param value  percentage value
          */
@@ -169,6 +281,11 @@ public abstract class CoverageMetricsAdapter<M extends HealthReportingAction> im
             }
         }
 
+        /**
+         * Adds all metrics from a sub-report to this report
+         *
+         * @param subReport the sub-report to add
+         */
         public void putAll(Map<Metric, Integer> subReport) {
             for (Map.Entry<Metric, Integer> entry : subReport.entrySet()) {
                 report.put(entry.getKey().toString(), entry.getValue());

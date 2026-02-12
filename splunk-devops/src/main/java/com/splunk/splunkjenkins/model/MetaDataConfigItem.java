@@ -17,8 +17,10 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
+ * Configuration item for Splunk metadata settings.
+ * Allows per-event-type configuration of index, sourcetype, and other metadata.
+ *
  * @since 1.4
- * Helper class for metadata configure
  */
 public class MetaDataConfigItem implements Describable<MetaDataConfigItem> {
     private static final String DISABLED_KEY = "disabled";
@@ -31,30 +33,67 @@ public class MetaDataConfigItem implements Describable<MetaDataConfigItem> {
     //can only be null if enabled is false
     private String value;
 
+    /**
+     * Gets the data source for this metadata configuration
+     *
+     * @return the data source
+     */
     public String getDataSource() {
         return dataSource;
     }
 
+    /**
+     * Sets the data source for this metadata configuration
+     *
+     * @param dataSource the data source to set
+     */
     public void setDataSource(@NonNull String dataSource) {
         this.dataSource = dataSource;
     }
 
+    /**
+     * Gets the key name for this metadata configuration
+     *
+     * @return the key name
+     */
     public String getKeyName() {
         return keyName;
     }
 
+    /**
+     * Sets the key name for this metadata configuration
+     *
+     * @param keyName the key name to set
+     */
     public void setKeyName(@NonNull String keyName) {
         this.keyName = keyName;
     }
 
+    /**
+     * Gets the value for this metadata configuration
+     *
+     * @return the value
+     */
     public String getValue() {
         return value;
     }
 
+    /**
+     * Sets the value for this metadata configuration
+     *
+     * @param value the value to set
+     */
     public void setValue(String value) {
         this.value = value;
     }
 
+    /**
+     * Constructs a MetaDataConfigItem with the specified data source, key name, and value
+     *
+     * @param dataSource the data source
+     * @param keyName the key name
+     * @param value the value
+     */
     @DataBoundConstructor
     public MetaDataConfigItem(String dataSource, String keyName, String value) {
         this.dataSource = dataSource;
@@ -62,6 +101,11 @@ public class MetaDataConfigItem implements Describable<MetaDataConfigItem> {
         this.value = value;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * Returns a string representation of this metadata configuration item
+     */
     @Override
     public String toString() {
         String prefix = dataSource.toLowerCase() + ".";
@@ -75,11 +119,13 @@ public class MetaDataConfigItem implements Describable<MetaDataConfigItem> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return toString().hashCode();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
@@ -91,11 +137,15 @@ public class MetaDataConfigItem implements Describable<MetaDataConfigItem> {
         return this.toString().equals(obj.toString());
     }
 
+    /** {@inheritDoc} */
     @Override
     public Descriptor<MetaDataConfigItem> getDescriptor() {
         return Jenkins.getInstance().getDescriptor(MetaDataConfigItem.class);
     }
 
+    /**
+     * Descriptor for MetaDataConfigItem that provides UI form field options
+     */
     @Extension
     public static class DescriptorImpl extends Descriptor<MetaDataConfigItem> {
 
@@ -105,9 +155,9 @@ public class MetaDataConfigItem implements Describable<MetaDataConfigItem> {
         }
 
         /**
-         * This method determines the values of the album drop-down list box.
+         * Provides available data source options for the configuration UI
          *
-         * @return options for selection
+         * @return ListBoxModel with available event types and default option
          */
         public ListBoxModel doFillDataSourceItems() {
             ListBoxModel m = new ListBoxModel();
@@ -123,9 +173,9 @@ public class MetaDataConfigItem implements Describable<MetaDataConfigItem> {
         }
 
         /**
-         * This method determines the values of the album drop-down list box.
+         * Provides available metadata key options for the configuration UI
          *
-         * @return options for selection
+         * @return ListBoxModel with available metadata keys (index, sourcetype, disabled)
          */
         public static ListBoxModel doFillKeyNameItems() {
             ListBoxModel m = new ListBoxModel();
@@ -136,6 +186,12 @@ public class MetaDataConfigItem implements Describable<MetaDataConfigItem> {
         }
     }
 
+    /**
+     * Loads metadata configuration items from a properties string
+     *
+     * @param properties the properties string in Java properties format
+     * @return a set of metadata configuration items
+     */
     public static Set<MetaDataConfigItem> loadProps(String properties) {
         Set<MetaDataConfigItem> config = new HashSet<>();
         if (properties != null) {
@@ -187,6 +243,12 @@ public class MetaDataConfigItem implements Describable<MetaDataConfigItem> {
         return sbf.toString();
     }
 
+    /**
+     * Gets the CSS display style for this metadata configuration item
+     * Used to hide the value field when the key is "disabled"
+     *
+     * @return the CSS display style
+     */
     public String getCssDisplay() {
         if (DISABLED_KEY.equals(this.keyName)) {
             return "display:none";

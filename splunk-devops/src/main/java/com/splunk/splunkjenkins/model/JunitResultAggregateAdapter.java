@@ -8,8 +8,16 @@ import hudson.tasks.test.AggregatedTestResultAction;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter for aggregated JUnit test results from multiple publishers.
+ */
 @Extension(optional = true)
 public class JunitResultAggregateAdapter extends AbstractTestResultAdapter<AggregatedTestResultAction> {
+    /**
+     * {@inheritDoc}
+     *
+     * Gets the aggregated test results from multiple publishers
+     */
     @Override
     public List<CaseResult> getTestResult(AggregatedTestResultAction resultAction) {
         List<CaseResult> caseResults = new ArrayList<>();

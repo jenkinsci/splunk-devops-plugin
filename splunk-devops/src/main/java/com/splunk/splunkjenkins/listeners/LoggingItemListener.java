@@ -11,34 +11,44 @@ import static com.splunk.splunkjenkins.utils.LogEventHelper.getRelativeJenkinsHo
 import static com.splunk.splunkjenkins.utils.LogEventHelper.getUserName;
 import static com.splunk.splunkjenkins.utils.LogEventHelper.logUserAction;
 
+/**
+ * Listens for Jenkins item (job) lifecycle events and logs them to Splunk.
+ * Tracks create, copy, delete, update, and rename operations for audit trail.
+ */
 @Extension
 public class LoggingItemListener extends ItemListener {
+    /** {@inheritDoc} */
     @Override
     public void onCreated(Item item) {
         logUserAction(getUserName(), Messages.audit_create_item(getConfigPath(item)));
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onCopied(Item src, Item item) {
         logUserAction(getUserName(), Messages.audit_cloned_item(getConfigPath(item), getConfigPath(src)));
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onDeleted(Item item) {
         logUserAction(getUserName(), Messages.audit_delete_item(getConfigPath(item)));
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onRenamed(Item item, String oldName, String newName) {
         //no-op, we use onLocationChanged
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onUpdated(Item item) {
         //prior to delete, makeDisabled was called and onUpdated is triggered
         logUserAction(getUserName(), Messages.audit_update_item(getConfigPath(item)));
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onLocationChanged(Item item, String oldFullName, String newFullName) {
         logUserAction(getUserName(), Messages.audit_rename_item(oldFullName, newFullName));
@@ -51,6 +61,7 @@ public class LoggingItemListener extends ItemListener {
         return getRelativeJenkinsHomePath(item.getRootDir() + File.separator + "config.xml");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onBeforeShutdown() {
         SplunkLogService.getInstance().stopWorker();

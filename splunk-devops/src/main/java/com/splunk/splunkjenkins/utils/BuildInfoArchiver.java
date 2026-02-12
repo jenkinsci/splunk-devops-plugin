@@ -21,6 +21,10 @@ import java.util.WeakHashMap;
 
 import static com.splunk.splunkjenkins.model.EventType.CONSOLE_LOG;
 
+/**
+ * Utility for resending historical build information to Splunk.
+ * Allows replaying build data for migration or recovery purposes.
+ */
 public class BuildInfoArchiver {
     Set<String> processedJob = Collections.newSetFromMap(
             new WeakHashMap<String, Boolean>());
@@ -45,6 +49,8 @@ public class BuildInfoArchiver {
     }
 
     /**
+     * Send existing builds for a specific job within a time range
+     *
      * @param jobName   the job name, e.g. /folder/jobname or /job/folder/job/jobname
      * @param startTime the start time window of build
      * @param endTime   the end time window of build
@@ -56,6 +62,8 @@ public class BuildInfoArchiver {
     }
 
     /**
+     * Send existing builds for a specific job using a custom predicate
+     *
      * @param jobName   the job name, e.g. /folder/jobname or /job/folder/job/jobname
      * @param predicate function to check whether build apply
      * @return total number of builds whose result or log was resent
@@ -66,6 +74,8 @@ public class BuildInfoArchiver {
     }
 
     /**
+     * Send a specific build to Splunk
+     *
      * @param buildUrl /job/folder/job/jobname/number
      * @return true if the build is resend
      */
@@ -87,6 +97,8 @@ public class BuildInfoArchiver {
     }
 
     /**
+     * Send existing builds for a specific job within a build number range
+     *
      * @param jobName the job name, e.g. /folder/jobname or /job/folder/job/jobname
      * @param start   start build number
      * @param end     end build number
@@ -98,8 +110,10 @@ public class BuildInfoArchiver {
     }
 
     /**
-     * @param jobName
-     * @return normalized job name, replaced job URL /job/ with / if necessary
+     * Normalizes the job name by replacing job URL /job/ with / if necessary
+     *
+     * @param jobName the job name to normalize
+     * @return the Jenkins job item
      */
     private Item normalizeJob(String jobName) {
         Item item = Jenkins.getInstance().getItem(jobName, (ItemGroup) null);
@@ -170,14 +184,29 @@ public class BuildInfoArchiver {
         }
     }
 
+    /**
+     * Predicate for filtering builds based on their completion time
+     */
     public static class BuildTimePredict implements Predicate<Run> {
         long startTime, endTime;
 
+        /**
+         * Creates a predicate that filters builds within a time range
+         *
+         * @param startTime the start timestamp (inclusive)
+         * @param endTime   the end timestamp (exclusive)
+         */
         public BuildTimePredict(long startTime, long endTime) {
             this.startTime = startTime;
             this.endTime = endTime;
         }
 
+        /**
+         * Checks whether the build's completion time falls within the specified range
+         *
+         * @param run the Jenkins build to check
+         * @return true if the build's completion time is between startTime (inclusive) and endTime (exclusive)
+         */
         @Override
         public boolean apply(@NonNull Run run) {
             long jobTimestamp = run.getStartTimeInMillis() + run.getDuration();
@@ -189,14 +218,29 @@ public class BuildInfoArchiver {
         }
     }
 
+    /**
+     * Predicate for filtering builds based on their build number
+     */
     public static class BuildIdPredict implements Predicate<Run> {
         int startId, endId;
 
+        /**
+         * Creates a predicate that filters builds within a build number range
+         *
+         * @param startId the start build number (inclusive)
+         * @param endId   the end build number (exclusive)
+         */
         public BuildIdPredict(int startId, int endId) {
             this.startId = startId;
             this.endId = endId;
         }
 
+        /**
+         * Checks whether the build's number falls within the specified range
+         *
+         * @param run the Jenkins build to check
+         * @return true if the build's number is between startId (inclusive) and endId (exclusive)
+         */
         @Override
         public boolean apply(@NonNull Run run) {
             //check whether the build is in the time range

@@ -22,6 +22,10 @@ import static com.splunk.splunkjenkins.utils.LogEventHelper.getMasterStats;
 import static com.splunk.splunkjenkins.utils.LogEventHelper.getRunningJob;
 import static com.splunk.splunkjenkins.utils.LogEventHelper.getSlaveStats;
 
+/**
+ * Monitors Jenkins health and sends periodic updates to Splunk.
+ * Tracks slave node status, queue information, and JVM memory usage.
+ */
 @Extension
 public class HealthMonitor extends AsyncPeriodicWork {
     //make sure no less than 2 minutes, default is 8 minutes
@@ -30,12 +34,25 @@ public class HealthMonitor extends AsyncPeriodicWork {
 
     private Set<String> slaveNames = new HashSet<>();
     //use protected to allow tweak it in testcase
+    /**
+     * Timestamp of the last time slave information was accessed
+     */
     protected long lastAccessTime = System.currentTimeMillis();
 
+    /**
+     * Creates a HealthMonitor instance for monitoring Jenkins health
+     * and sending periodic updates to Splunk
+     */
     public HealthMonitor() {
         super("Splunk data monitor");
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * Executes the health monitoring task, checking Jenkins queue status
+     * and sending node updates to Splunk if the configured time period has elapsed.
+     */
     @Override
     protected void execute(TaskListener listener) throws IOException, InterruptedException {
         if (!SplunkJenkinsInstallation.get().isEnabled()) {
@@ -115,6 +132,7 @@ public class HealthMonitor extends AsyncPeriodicWork {
         SplunkLogService.getInstance().sendBatch(queue, QUEUE_INFO);
     }
 
+    /** {@inheritDoc} */
     @Override
     public long getRecurrencePeriod() {
         return period;

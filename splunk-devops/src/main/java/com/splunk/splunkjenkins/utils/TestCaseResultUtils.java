@@ -16,6 +16,9 @@ import java.util.Map;
 
 import static com.splunk.splunkjenkins.utils.LogEventHelper.hasPublisherName;
 
+/**
+ * Utilities for processing and splitting test case results.
+ */
 public class TestCaseResultUtils {
     /**
      * split test result into groups, each contains maximum pageSize testcases
@@ -45,6 +48,8 @@ public class TestCaseResultUtils {
     }
 
     /**
+     * <p>splitRaw.</p>
+     *
      * @param resultAction Junit Test Result Action
      * @param pageSize     how many test cases to hold in one page
      * @return A list of JunitTestCaseGroup
@@ -118,6 +123,8 @@ public class TestCaseResultUtils {
     }
 
     /**
+     * <p>getSummary.</p>
+     *
      * @param build Jenkins build
      * @return summary of failures,passes,skips, total and duration
      */

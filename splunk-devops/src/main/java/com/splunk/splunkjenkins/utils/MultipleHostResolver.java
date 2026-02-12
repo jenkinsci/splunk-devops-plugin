@@ -7,9 +7,16 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Resolves multiple comma-separated hostnames to IP addresses.
+ */
 public class MultipleHostResolver implements DnsResolver {
+    /**
+     * Delimiter for separating multiple hostnames
+     */
     public static final String NAME_DELIMITER = ",";
 
+    /** {@inheritDoc} */
     @Override
     public InetAddress[] resolve(final String host) throws UnknownHostException {
         if (host == null) {

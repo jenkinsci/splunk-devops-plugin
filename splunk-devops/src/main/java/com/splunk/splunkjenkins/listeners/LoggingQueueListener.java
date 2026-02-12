@@ -40,11 +40,13 @@ public class LoggingQueueListener extends QueueListener {
     // due to access policy hudson/model/Messages must not be used, hard code it here
     private final static String QUEUE_UNKNOWN_MSG = "???";
 
+    /** {@inheritDoc} */
     @Override
     public void onEnterWaiting(Queue.WaitingItem wi) {
         sendToSplunkOnEnter(wi.task, wi.getId(), Constants.ENQUEUE_TAG_NAME);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onLeaveWaiting(Queue.WaitingItem wi) {
         String causeOfWaiting = wi.getWhy();
@@ -55,11 +57,13 @@ public class LoggingQueueListener extends QueueListener {
                 Constants.WAITING_PHASE_NAME, causeOfWaiting, wi.getInQueueSince());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onEnterBlocked(Queue.BlockedItem bi) {
         sendToSplunkOnEnter(bi.task, bi.getId(), Constants.BLOCKED_PHASE_NAME);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onLeaveBlocked(Queue.BlockedItem bi) {
         String causeOfBlocked = bi.getWhy();
@@ -70,12 +74,14 @@ public class LoggingQueueListener extends QueueListener {
                 Constants.BLOCKED_PHASE_NAME, causeOfBlocked, bi.getInQueueSince());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onEnterBuildable(Queue.BuildableItem bi) {
         sendToSplunkOnEnter(bi.task, bi.getId(), Constants.BUILDABLE_PHASE_NAME);
 
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onLeaveBuildable(Queue.BuildableItem bi) {
         String causeOfWaiting = bi.getWhy();
@@ -86,6 +92,7 @@ public class LoggingQueueListener extends QueueListener {
                 Constants.BUILDABLE_PHASE_NAME, causeOfWaiting, bi.getInQueueSince());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onLeft(Queue.LeftItem li) {
         Float queueTime = sendToSplunkOnLeft(li.task, li.getId(),
@@ -111,6 +118,12 @@ public class LoggingQueueListener extends QueueListener {
         }
     }
 
+    /**
+     * Gets the queue time for a given queue ID
+     *
+     * @param Id the queue identifier
+     * @return the queue time in seconds, or 0 if not found
+     */
     public static Float getQueueTime(Long Id) {
         Float queueTime = cache.getIfPresent(Id);
         if (queueTime == null) {
@@ -232,6 +245,11 @@ public class LoggingQueueListener extends QueueListener {
         return queueTime;
     }
 
+    /**
+     * Invalidates/expires a queue entry from the cache
+     *
+     * @param Id the queue identifier to expire
+     */
     public static void expire(Long Id) {
         cache.invalidate(Id);
     }

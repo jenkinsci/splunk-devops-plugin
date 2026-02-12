@@ -28,6 +28,7 @@ public class CloverCoverageMetrics extends CoverageMetricsAdapter<CloverBuildAct
         return result;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<CoverageDetail> getReport(CloverBuildAction coverageAction) {
         ProjectCoverage projectCoverage = coverageAction.getResult();

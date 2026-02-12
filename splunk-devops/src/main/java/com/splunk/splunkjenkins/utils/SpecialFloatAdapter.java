@@ -8,7 +8,11 @@ import shaded.splk.com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
 
+/**
+ * Gson TypeAdapter for handling special float values (NaN, Infinity).
+ */
 public class SpecialFloatAdapter extends TypeAdapter<Float> {
+    /** {@inheritDoc} */
     @Override
     public void write(JsonWriter jsonWriter, Float number) throws IOException {
         if (number == null || Float.isNaN(number) || Float.isInfinite(number)) {
@@ -18,6 +22,7 @@ public class SpecialFloatAdapter extends TypeAdapter<Float> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Float read(JsonReader in) throws IOException {
         if (in.peek() == JsonToken.NULL) {

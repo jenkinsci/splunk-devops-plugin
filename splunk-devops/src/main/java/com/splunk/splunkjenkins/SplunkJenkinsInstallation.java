@@ -55,6 +55,10 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 
+/**
+ * Global configuration for the Splunk Jenkins plugin.
+ * Manages connection settings, metadata configuration, and plugin behavior.
+ */
 @Extension
 public class SplunkJenkinsInstallation extends GlobalConfiguration {
     private static transient boolean logHandlerRegistered = false;
@@ -84,6 +88,9 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
     private Boolean globalPipelineFilter;
 
     //below are all transient properties
+    /**
+     * Metadata properties configuration (transient, not persisted)
+     */
     public transient Properties metaDataProperties = new Properties();
     //cached values, will not be saved to disk!
     private transient String jsonUrl;
@@ -95,12 +102,21 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
     private transient String defaultMetaData;
     private transient Pattern ignoredJobPattern;
 
+    /**
+     * Constructs SplunkJenkinsInstallation with option to load from configuration file
+     *
+     * @param useConfigFile whether to load configuration from disk
+     */
     public SplunkJenkinsInstallation(boolean useConfigFile) {
         if (useConfigFile) {
             load();
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * Loads configuration from disk and initializes default metadata properties.
+     */
     @Override
     public synchronized final void load() {
         super.load();
@@ -113,10 +129,18 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         }
     }
 
+    /**
+     * Constructs SplunkJenkinsInstallation with default configuration loading
+     */
     public SplunkJenkinsInstallation() {
         this(true);
     }
 
+    /**
+     * Gets the singleton instance of SplunkJenkinsInstallation
+     *
+     * @return the SplunkJenkinsInstallation instance
+     */
     public static SplunkJenkinsInstallation get() {
         if (cachedConfig == null) {
             if (Jenkins.getInstanceOrNull() == null) {
@@ -143,6 +167,8 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
     }
 
     /**
+     * <p>isLogHandlerRegistered.</p>
+     *
      * @return true if the plugin had been setup by Jenkins (constructor had been called)
      */
     public static boolean isLogHandlerRegistered() {
@@ -168,6 +194,11 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         config.updateCache();
     }
 
+    /**
+     * {@inheritDoc}
+     * Handles the global configuration form submission, binding form data,
+     * updating the cache, and managing the log service lifecycle.
+     */
     @Override
     public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
@@ -193,8 +224,11 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         return true;
     }
 
-    /*
-     * Form validation methods
+    /**
+     * Validates the Splunk hostname configuration
+     *
+     * @param hostName the hostname to validate
+     * @return a {@link hudson.util.FormValidation} object.
      */
     @RequirePOST
     public FormValidation doCheckHost(@QueryParameter("value") String hostName) {
@@ -217,9 +251,16 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         }
     }
 
+
+    /**
+     * Validates the Splunk token configuration
+     *
+     * @param token the token to validate
+     * @return a {@link hudson.util.FormValidation} object.
+     */
     @RequirePOST
     public FormValidation doCheckToken(@QueryParameter("value") Secret token) {
-        String value=Secret.toString(token);
+        String value = Secret.toString(token);
         //check GUID format such as 18654C68-B28B-4450-9CF0-6E7645CA60CA
         if (StringUtils.isBlank(value) || !uuidPattern.matcher(value).find()) {
             return FormValidation.warning(Messages.InvalidToken());
@@ -228,6 +269,17 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         return FormValidation.ok();
     }
 
+
+    /**
+     * Tests the Splunk HTTP Event Collector connection
+     *
+     * @param host           the Splunk host
+     * @param port           the Splunk port
+     * @param token          the authentication token
+     * @param useSSL         whether to use SSL
+     * @param metaDataConfig metadata configuration
+     * @return a {@link hudson.util.FormValidation} object.
+     */
     @RequirePOST
     public FormValidation doTestHttpInput(@QueryParameter String host, @QueryParameter int port,
                                           @QueryParameter Secret token, @QueryParameter boolean useSSL,
@@ -248,6 +300,13 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         return verifyHttpInput(config);
     }
 
+
+    /**
+     * Validates the Groovy script content
+     *
+     * @param value the script content to validate
+     * @return a {@link hudson.util.FormValidation} object.
+     */
     @RequirePOST
     public FormValidation doCheckScriptContent(@QueryParameter String value) {
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
@@ -257,6 +316,13 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         return validateGroovyScript(value);
     }
 
+
+    /**
+     * Validates the maximum events batch size configuration
+     *
+     * @param value the batch size value to validate
+     * @return a {@link hudson.util.FormValidation} object.
+     */
     @RequirePOST
     public FormValidation doCheckMaxEventsBatchSize(@QueryParameter int value) {
         if (value < MIN_BUFFER_SIZE || value > MAX_BATCH_SIZE) {
@@ -265,6 +331,13 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         return FormValidation.ok();
     }
 
+
+    /**
+     * Validates the ignored jobs regex pattern
+     *
+     * @param value the regex pattern to validate
+     * @return a {@link hudson.util.FormValidation} object.
+     */
     @RequirePOST
     public FormValidation doCheckIgnoredJobs(@QueryParameter String value) {
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
@@ -277,6 +350,10 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
     }
 
     ////////END OF FORM VALIDATION/////////
+    /**
+     * Updates the cached configuration values including URLs, script content,
+     * metadata properties, and ignored job patterns.
+     */
     protected void updateCache() {
         if (!this.enabled) {
             //nothing to do if not enabled
@@ -380,12 +457,22 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         return this.postActionScript;
     }
 
+    /**
+     * Creates a GroovyCodeSource from the current script content.
+     *
+     * @return the compiled GroovyCodeSource for the user script
+     */
     public GroovyCodeSource getCode() {
         String script = getScript();
         GroovyCodeSource codeSource = new GroovyCodeSource(script, "SplunkinUserScript" + scriptTimestamp, DEFAULT_CODE_BASE);
         return codeSource;
     }
 
+    /**
+     * Checks whether raw event sending is enabled.
+     *
+     * @return true if raw event sending is enabled
+     */
     public boolean isRawEventEnabled() {
         return rawEventEnabled;
     }
@@ -402,19 +489,36 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         return rawEventEnabled && eventType.needSplit();
     }
 
+    /**
+     * Gets the Splunk HEC authentication token.
+     *
+     * @return the token as a Secret
+     */
     public Secret getToken() {
         return token;
     }
 
+    /**
+     * Gets the plain text value of the Splunk HEC token.
+     *
+     * @return the token value as a string, never null
+     */
     @NonNull
     public String getTokenValue() {
         return Secret.toString(token);
     }
+    /**
+     * Gets the maximum number of retries on error.
+     *
+     * @return the maximum number of retries
+     */
     public long getMaxRetries() {
         return retriesOnError;
     }
 
     /**
+     * <p>getMetaData.</p>
+     *
      * @param keyName such as host,source,index
      * @return the configured metadata
      */
@@ -422,22 +526,49 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         return metaDataProperties.getProperty(keyName);
     }
 
+    /**
+     * Gets the Splunk HEC JSON event endpoint URL.
+     *
+     * @return the JSON endpoint URL
+     */
     public String getJsonUrl() {
         return jsonUrl;
     }
 
+    /**
+     * Gets the Splunk HEC raw event endpoint URL.
+     *
+     * @return the raw endpoint URL
+     */
     public String getRawUrl() {
         return rawUrl;
     }
 
+    /**
+     * Checks whether the plugin is enabled.
+     *
+     * @return true if the plugin is enabled
+     */
     public boolean isEnabled() {
         return enabled;
     }
 
+    /**
+     * <p>isEventDisabled.</p>
+     *
+     * @param eventType a {@link com.splunk.splunkjenkins.model.EventType} object.
+     * @return a boolean.
+     */
     public boolean isEventDisabled(EventType eventType) {
         return !isValid() || metaDataProperties == null || "false".equals(metaDataProperties.getProperty(eventType.getKey("enabled")));
     }
 
+    /**
+     * <p>isJobIgnored.</p>
+     *
+     * @param jobUrl a {@link java.lang.String} object.
+     * @return a boolean.
+     */
     public boolean isJobIgnored(String jobUrl) {
         boolean ignored = false;
         if (JOB_CONSOLE_FILTER_WHITELIST_PATTERN != null) {
@@ -454,34 +585,74 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         return ignored;
     }
 
+    /**
+     * <p>Setter for the field <code>enabled</code>.</p>
+     *
+     * @param enabled a boolean.
+     */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
+    /**
+     * <p>Getter for the field <code>host</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getHost() {
         return host;
     }
 
+    /**
+     * <p>Setter for the field <code>host</code>.</p>
+     *
+     * @param host a {@link java.lang.String} object.
+     */
     public void setHost(String host) {
         this.host = host;
     }
 
+    /**
+     * <p>Setter for the field <code>token</code>.</p>
+     *
+     * @param token a {@link hudson.util.Secret} object.
+     */
     public void setToken(Secret token) {
         this.token = token;
     }
 
+    /**
+     * <p>isUseSSL.</p>
+     *
+     * @return a boolean.
+     */
     public boolean isUseSSL() {
         return useSSL;
     }
 
+    /**
+     * <p>Setter for the field <code>useSSL</code>.</p>
+     *
+     * @param useSSL a boolean.
+     */
     public void setUseSSL(boolean useSSL) {
         this.useSSL = useSSL;
     }
 
+    /**
+     * <p>Getter for the field <code>maxEventsBatchSize</code>.</p>
+     *
+     * @return a long.
+     */
     public long getMaxEventsBatchSize() {
         return maxEventsBatchSize;
     }
 
+    /**
+     * <p>Setter for the field <code>maxEventsBatchSize</code>.</p>
+     *
+     * @param maxEventsBatchSize a long.
+     */
     public void setMaxEventsBatchSize(long maxEventsBatchSize) {
         if (maxEventsBatchSize > MIN_BUFFER_SIZE) {
             this.maxEventsBatchSize = maxEventsBatchSize;
@@ -490,50 +661,110 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         }
     }
 
+    /**
+     * <p>Setter for the field <code>rawEventEnabled</code>.</p>
+     *
+     * @param rawEventEnabled a boolean.
+     */
     public void setRawEventEnabled(boolean rawEventEnabled) {
         this.rawEventEnabled = rawEventEnabled;
     }
 
+    /**
+     * <p>Getter for the field <code>metaDataConfig</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getMetaDataConfig() {
         return metaDataConfig;
     }
 
+    /**
+     * <p>Setter for the field <code>metaDataConfig</code>.</p>
+     *
+     * @param metaDataConfig a {@link java.lang.String} object.
+     */
     public void setMetaDataConfig(String metaDataConfig) {
         this.metaDataConfig = metaDataConfig;
     }
 
+    /**
+     * <p>Getter for the field <code>port</code>.</p>
+     *
+     * @return a {@link java.lang.Integer} object.
+     */
     public Integer getPort() {
         return port;
     }
 
+    /**
+     * <p>Setter for the field <code>port</code>.</p>
+     *
+     * @param port a {@link java.lang.Integer} object.
+     */
     public void setPort(Integer port) {
         this.port = port;
     }
 
+    /**
+     * <p>Getter for the field <code>retriesOnError</code>.</p>
+     *
+     * @return a long.
+     */
     public long getRetriesOnError() {
         return retriesOnError;
     }
 
+    /**
+     * <p>Setter for the field <code>retriesOnError</code>.</p>
+     *
+     * @param retriesOnError a long.
+     */
     public void setRetriesOnError(long retriesOnError) {
         this.retriesOnError = retriesOnError;
     }
 
+    /**
+     * <p>Getter for the field <code>scriptPath</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getScriptPath() {
         return scriptPath;
     }
 
+    /**
+     * <p>Setter for the field <code>scriptPath</code>.</p>
+     *
+     * @param scriptPath a {@link java.lang.String} object.
+     */
     public void setScriptPath(String scriptPath) {
         this.scriptPath = scriptPath;
     }
 
+    /**
+     * Gets the Groovy script content
+     *
+     * @return the script content
+     */
     public String getScriptContent() {
         return scriptContent;
     }
 
+    /**
+     * Sets the Groovy script content
+     *
+     * @param scriptContent the script content to set
+     */
     public void setScriptContent(String scriptContent) {
         this.scriptContent = scriptContent;
     }
 
+    /**
+     * Converts the configuration to a Map for agent communication
+     *
+     * @return map representation of the configuration
+     */
     public Map toMap() {
         HashMap map = new HashMap();
         map.put("token", this.getTokenValue());
@@ -549,6 +780,11 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         return map;
     }
 
+    /**
+     * Gets the script content or returns the default DSL script
+     *
+     * @return script content or default DSL script
+     */
     public String getScriptOrDefault() {
         if (scriptContent == null && scriptPath == null) {
             //when user clear the text on UI, it will be set to empty string
@@ -559,6 +795,11 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         }
     }
 
+    /**
+     * Gets the Splunk app URL
+     *
+     * @return the Splunk app URL, or a default based on the host
+     */
     public String getSplunkAppUrl() {
         if (isEmpty(splunkAppUrl) && isNotEmpty(host)) {
             return "http://" + host + ":8000/en-US/app/splunk_app_jenkins/";
@@ -566,6 +807,11 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         return splunkAppUrl;
     }
 
+    /**
+     * Gets the Splunk app URL or help page if not configured
+     *
+     * @return the Splunk app URL or help page URL
+     */
     public String getAppUrlOrHelp() {
         String url = getSplunkAppUrl();
         if (isEmpty(url)) {
@@ -574,6 +820,11 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         return url;
     }
 
+    /**
+     * Sets the Splunk app URL
+     *
+     * @param splunkAppUrl the Splunk app URL to set
+     */
     public void setSplunkAppUrl(String splunkAppUrl) {
         if (!isEmpty(splunkAppUrl) && !splunkAppUrl.endsWith("/")) {
             splunkAppUrl += "/";
@@ -589,10 +840,20 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         }
     }
 
+    /**
+     * <p>Getter for the field <code>metadataItemSet</code>.</p>
+     *
+     * @return a {@link java.util.Set} object.
+     */
     public Set<MetaDataConfigItem> getMetadataItemSet() {
         return metadataItemSet;
     }
 
+    /**
+     * <p>Getter for the field <code>metadataHost</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getMetadataHost() {
         if (metadataHost != null) {
             return metadataHost;
@@ -618,15 +879,30 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         }
     }
 
+    /**
+     * <p>Setter for the field <code>metadataHost</code>.</p>
+     *
+     * @param metadataHost a {@link java.lang.String} object.
+     */
     public void setMetadataHost(String metadataHost) {
         this.metadataHost = metadataHost;
     }
 
+    /**
+     * <p>Setter for the field <code>metadataItemSet</code>.</p>
+     *
+     * @param metadataItemSet a {@link java.util.Set} object.
+     */
     public void setMetadataItemSet(Set<MetaDataConfigItem> metadataItemSet) {
         this.metadataItemSet = metadataItemSet;
         this.metaDataConfig = MetaDataConfigItem.toString(metadataItemSet);
     }
 
+    /**
+     * <p>Getter for the field <code>metadataSource</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getMetadataSource() {
         if (metadataSource != null) {
             return metadataSource;
@@ -637,10 +913,21 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         }
     }
 
+    /**
+     * <p>Getter for the field <code>metadataSource</code>.</p>
+     *
+     * @param suffix a {@link java.lang.String} object.
+     * @return a {@link java.lang.String} object.
+     */
     public String getMetadataSource(String suffix) {
         return getMetadataSource() + JENKINS_SOURCE_SEP + suffix;
     }
 
+    /**
+     * <p>Setter for the field <code>metadataSource</code>.</p>
+     *
+     * @param metadataSource a {@link java.lang.String} object.
+     */
     public void setMetadataSource(String metadataSource) {
         this.metadataSource = metadataSource;
     }
@@ -659,22 +946,47 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         }
     }
 
+    /**
+     * <p>Getter for the field <code>ignoredJobs</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getIgnoredJobs() {
         return ignoredJobs;
     }
 
+    /**
+     * <p>Setter for the field <code>ignoredJobs</code>.</p>
+     *
+     * @param ignoredJobs a {@link java.lang.String} object.
+     */
     public void setIgnoredJobs(String ignoredJobs) {
         this.ignoredJobs = ignoredJobs;
     }
 
+    /**
+     * <p>Getter for the field <code>globalPipelineFilter</code>.</p>
+     *
+     * @return a {@link java.lang.Boolean} object.
+     */
     public Boolean getGlobalPipelineFilter() {
         return globalPipelineFilter;
     }
 
+    /**
+     * <p>Setter for the field <code>globalPipelineFilter</code>.</p>
+     *
+     * @param globalPipelineFilter a {@link java.lang.Boolean} object.
+     */
     public void setGlobalPipelineFilter(Boolean globalPipelineFilter) {
         this.globalPipelineFilter = globalPipelineFilter;
     }
 
+    /**
+     * <p>isPipelineFilterEnabled.</p>
+     *
+     * @return a boolean.
+     */
     public boolean isPipelineFilterEnabled() {
         return Boolean.TRUE.equals(globalPipelineFilter);
     }

@@ -18,18 +18,61 @@ import java.util.logging.Level;
 import static com.splunk.splunkjenkins.Constants.MIN_BUFFER_SIZE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * Callable for sending log files from remote agents to Splunk.
+ */
 public class LogFileCallable implements FilePath.FileCallable<Integer> {
+    /**
+     * Serialization version UID for this class.
+     */
     private static final long serialVersionUID = 5303809353063980298L;
+    /**
+     * Logger instance for this class.
+     */
     private static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(LogFileCallable.class.getName());
+    /**
+     * System property name for configuring the timeout duration.
+     */
     private static final String TIMEOUT_NAME = LogFileCallable.class.getName() + ".timeout";
+    /**
+     * Maximum wait time in minutes for sending files to Splunk.
+     * Defaults to 5 minutes, configurable via system property.
+     */
     private final int WAIT_MINUTES = Integer.getInteger(TIMEOUT_NAME, 5);
+    /**
+     * Base name/path for the log file.
+     */
     private final String baseName;
+    /**
+     * URL of the Jenkins build associated with this log file.
+     */
     private final String buildUrl;
+    /**
+     * Event collector properties for sending data to Splunk.
+     */
     private final Map eventCollectorProperty;
+    /**
+     * Whether to send log files directly from the slave/agent node.
+     */
     private final boolean sendFromSlave;
+    /**
+     * Maximum allowed file size for log file transmission.
+     */
     private final long maxFileSize;
+    /**
+     * Whether Splunk configuration has been initialized on remote agents.
+     */
     private boolean enabledSplunkConfig = false;
 
+    /**
+     * Creates a LogFileCallable instance for sending log files to Splunk
+     *
+     * @param baseName the base name/path for the file
+     * @param buildUrl the build URL
+     * @param eventCollectorProperty event collector properties
+     * @param sendFromSlave whether to send from slave node
+     * @param maxFileSize maximum file size allowed
+     */
     public LogFileCallable(String baseName, String buildUrl,
                            Map eventCollectorProperty, boolean sendFromSlave, long maxFileSize) {
         this.baseName = baseName;
@@ -39,6 +82,12 @@ public class LogFileCallable implements FilePath.FileCallable<Integer> {
         this.maxFileSize = maxFileSize;
     }
 
+    /**
+     * Sends files to Splunk
+     *
+     * @param paths array of FilePath objects to send
+     * @return number of events sent
+     */
     public int sendFiles(FilePath[] paths) {
         int eventCount = 0;
         for (FilePath path : paths) {
@@ -65,7 +114,16 @@ public class LogFileCallable implements FilePath.FileCallable<Integer> {
         }
         return eventCount;
     }
-    
+
+    /**
+     * Sends a file to Splunk via HTTP event collector
+     *
+     * @param fileName the name of the file being sent
+     * @param input the InputStream containing the file content
+     * @return number of events sent
+     * @throws IOException if an I/O error occurs
+     * @throws InterruptedException if the operation is interrupted
+     */
     @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     public Integer send(String fileName, InputStream input) throws IOException, InterruptedException {
         long throttleSize = SplunkJenkinsInstallation.get().getMaxEventsBatchSize();
@@ -115,6 +173,9 @@ public class LogFileCallable implements FilePath.FileCallable<Integer> {
         return count;
     }
 
+    /**
+     * Initializes Splunk configuration on remote agents if not already initialized
+     */
     private void initSplunkins() {
         if (enabledSplunkConfig) {
             return;
@@ -123,6 +184,13 @@ public class LogFileCallable implements FilePath.FileCallable<Integer> {
         enabledSplunkConfig = true;
     }
 
+    /**
+     * Flushes log data to Splunk
+     *
+     * @param source the source name for the log data
+     * @param out the ByteArrayOutputStream containing the log data
+     * @param eventType the type of event
+     */
     private void flushLog(String source, ByteArrayOutputStream out, EventType eventType) {
         try {
             String text = out.toString("UTF-8");
@@ -134,9 +202,7 @@ public class LogFileCallable implements FilePath.FileCallable<Integer> {
         out.reset();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Integer invoke(File f, VirtualChannel channel) throws IOException, InterruptedException {
         if (!JenkinsJVM.isJenkinsJVM()) {
@@ -162,6 +228,7 @@ public class LogFileCallable implements FilePath.FileCallable<Integer> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void checkRoles(RoleChecker roleChecker) throws SecurityException {
 

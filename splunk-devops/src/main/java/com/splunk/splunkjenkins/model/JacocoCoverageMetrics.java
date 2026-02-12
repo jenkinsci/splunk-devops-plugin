@@ -21,6 +21,8 @@ import static com.splunk.splunkjenkins.Constants.COVERAGE_OVERALL_NAME;
  */
 @Extension(optional = true)
 public class JacocoCoverageMetrics extends CoverageMetricsAdapter<JacocoBuildAction> {
+
+    /** {@inheritDoc} */
     @Override
     public Map<Metric, Integer> getMetrics(JacocoBuildAction coverageAction) {
         return extract(coverageAction);
@@ -67,6 +69,14 @@ public class JacocoCoverageMetrics extends CoverageMetricsAdapter<JacocoBuildAct
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * Generates a detailed coverage report from the JaCoCo coverage action.
+     * <p>
+     * Creates a hierarchical coverage report including project-level summary,
+     * package-level metrics, file-level details, class-level data, and method-level metrics.
+     */
     @Override
     public List<CoverageDetail> getReport(JacocoBuildAction coverageAction) {
         CoverageReport report = coverageAction.getResult();
@@ -97,6 +107,4 @@ public class JacocoCoverageMetrics extends CoverageMetricsAdapter<JacocoBuildAct
         }
         return result;
     }
-
-
 }

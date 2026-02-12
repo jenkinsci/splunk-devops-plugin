@@ -65,9 +65,15 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static org.apache.commons.lang3.reflect.MethodUtils.getAccessibleMethod;
 
+/**
+ * Provides helper methods for building and sending events to Splunk.
+ */
 public class LogEventHelper {
     //see also hudson.util.wrapToErrorSpan
     private static final Pattern ERROR_SPAN_CONTENT = Pattern.compile("error.*?>(.*?)</span>", Pattern.CASE_INSENSITIVE);
+    /**
+     * Separator string for formatting output
+     */
     public static final String SEPARATOR = "    ";
     private static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(LogEventHelper.class.getName());
     private static final String JSON_CHANNEL_ID = UUID.randomUUID().toString().toUpperCase();
@@ -89,6 +95,13 @@ public class LogEventHelper {
 
     private static boolean gzipEnabled = !Boolean.getBoolean(LogEventHelper.class.getName() + ".disableGzip");
 
+    /**
+     * Builds an HTTP POST request for sending events to Splunk
+     *
+     * @param record the event record to send
+     * @param config Splunk Jenkins installation configuration
+     * @return HTTP POST request configured for Splunk
+     */
     public static HttpPost buildPost(EventRecord record, SplunkJenkinsInstallation config) {
         HttpPost postMethod;
         if (config.canPostRaw(record.getEventType())) {
@@ -138,6 +151,12 @@ public class LogEventHelper {
         }
     }
 
+    /**
+     * Verifies Splunk HTTP connection by sending test events
+     *
+     * @param config Splunk Jenkins installation configuration
+     * @return FormValidation result indicating connection status
+     */
     public static FormValidation verifyHttpInput(SplunkJenkinsInstallation config) {
         HttpPost post = buildPost(new EventRecord("ping from jenkins plugin", EventType.LOG), config);
         HttpClient client = SplunkLogService.getInstance().getClient();
@@ -172,7 +191,12 @@ public class LogEventHelper {
         return FormValidation.ok("Splunk connection verified");
     }
 
-    
+    /**
+     * Checks if a string value is non-empty
+     *
+     * @param value the string value to check
+     * @return true if the value is not null or empty, false otherwise
+     */
     public static boolean nonEmpty(String value) {
         return emptyToNull(value) != null;
     }
@@ -198,6 +222,8 @@ public class LogEventHelper {
     }
 
     /**
+     * <p>getMasterStats.</p>
+     *
      * @return Jenkins master statistics with timestamp
      */
     public static Map<String, Object> getMasterStats() {
@@ -224,6 +250,19 @@ public class LogEventHelper {
         return event;
     }
 
+    /**
+     * Sends files from the workspace to Splunk
+     *
+     * @param build the Jenkins build
+     * @param ws the workspace filepath
+     * @param envVars the environment variables
+     * @param listener the task listener
+     * @param includes the file patterns to include
+     * @param excludes the file patterns to exclude
+     * @param sendFromSlave whether to send from slave
+     * @param maxFileSize the maximum file size
+     * @return the number of events sent
+     */
     public static int sendFiles(Run build, FilePath ws, Map<String, String> envVars, TaskListener listener,
                                 String includes, String excludes, boolean sendFromSlave, long maxFileSize) {
         int eventCount = 0;
@@ -255,6 +294,12 @@ public class LogEventHelper {
         return eventCount;
     }
 
+    /**
+     * Parses a file size string with optional unit suffix (KB, MB, GB, etc.)
+     *
+     * @param size the file size string (e.g., "10MB", "5GB")
+     * @return the file size in bytes, or 0 if invalid
+     */
     public static long parseFileSize(String size) {
         if (emptyToNull(size) == null) {
             return 0;
@@ -279,6 +324,8 @@ public class LogEventHelper {
     }
 
     /**
+     * <p>getTriggerUserName.</p>
+     *
      * @param run Jenkins Run
      * @return the user who triggered the build or upstream build
      */
@@ -348,9 +395,18 @@ public class LogEventHelper {
         return null;
     }
 
+    /**
+     * Builder for constructing URL query parameters
+     */
     public static class UrlQueryBuilder {
         private Map<String, String> query = new HashMap();
 
+        /**
+         * Converts a map of query parameters to a URL query string
+         *
+         * @param queryParameters the map of query parameters
+         * @return the URL query string (without the leading ?)
+         */
         public static String toString(Map<String, String> queryParameters) {
             URIBuilder builder = new URIBuilder();
             for (Map.Entry<String, String> keyPair : queryParameters.entrySet()) {
@@ -373,6 +429,13 @@ public class LogEventHelper {
             }
         }
 
+        /**
+         * Adds a parameter to the query if the key doesn't already exist and the value is not empty
+         *
+         * @param key the parameter key
+         * @param value the parameter value
+         * @return this builder for method chaining
+         */
         public UrlQueryBuilder putIfAbsent(String key, String value) {
             if (nonEmpty(value) && !"null".equals(value)) {
                 //Map.putIfAbsent was @since 1.8, use get and check null to check
@@ -384,16 +447,35 @@ public class LogEventHelper {
             return this;
         }
 
+        /**
+         * Gets the query parameters as an unmodifiable map
+         *
+         * @return the unmodifiable map of query parameters
+         */
         public Map getQueryMap() {
             return Collections.unmodifiableMap(query);
         }
 
+        /**
+         * Builds the query string from the accumulated parameters
+         *
+         * @return the URL query string
+         */
         public String build() {
             return UrlQueryBuilder.toString(this.query);
         }
     }
 
+    /**
+     * Gson field naming strategy that converts field names to lowercase
+     */
     static class LowerCaseStrategy implements FieldNamingStrategy {
+        /**
+         * Translates a field name to lowercase
+         *
+         * @param f the field to translate
+         * @return the lowercase field name
+         */
         @Override
         public String translateName(final Field f) {
             return f.getName().toLowerCase();
@@ -415,6 +497,12 @@ public class LogEventHelper {
         }
     }
 
+    /**
+     * Gets the status information of a Jenkins computer
+     *
+     * @param computer the Jenkins computer
+     * @return a map containing computer status information
+     */
     public static Map<String, Object> getComputerStatus(Computer computer) {
         String nodeName;
         Map slaveInfo = new HashMap();
@@ -455,6 +543,11 @@ public class LogEventHelper {
         return slaveInfo;
     }
 
+    /**
+     * Gets information about all currently running jobs
+     *
+     * @return a list of maps containing running job information
+     */
     public static List<Map> getRunningJob() {
         List<Map> builds = new ArrayList<>();
         for (Computer computer : Jenkins.getInstance().getComputers()) {
@@ -539,6 +632,8 @@ public class LogEventHelper {
     }
 
     /**
+     * <p>getSlaveStats.</p>
+     *
      * @return a map with slave name as key and monitor result as value
      * monitor result is a map with monitor name as key, monitor data as value
      */
@@ -562,6 +657,8 @@ public class LogEventHelper {
     }
 
     /**
+     * <p>getEnvironment.</p>
+     *
      * @param run the build
      * @return build env with masked password variables
      */
@@ -588,6 +685,8 @@ public class LogEventHelper {
     }
 
     /**
+     * <p>getBuildVariables.</p>
+     *
      * @param run       the build
      * @param completed the task is completed to compute scm info
      * @return build variables with password masked
@@ -612,6 +711,8 @@ public class LogEventHelper {
     }
 
     /**
+     * <p>getBuildVariables.</p>
+     *
      * @param run the build
      * @return build variables with password masked
      */
@@ -619,6 +720,12 @@ public class LogEventHelper {
         return getBuildVariables(run, true);
     }
 
+    /**
+     * Logs a user action as an audit trail event
+     *
+     * @param user the user who performed the action
+     * @param message the audit message describing the action
+     */
     public static void logUserAction(String user, String message) {
         if (SplunkJenkinsInstallation.get().isEventDisabled(JENKINS_CONFIG)) {
             return;
@@ -630,6 +737,11 @@ public class LogEventHelper {
         SplunkLogService.getInstance().send(logInfo, JENKINS_CONFIG, AUDIT_SOURCE);
     }
 
+    /**
+     * Asynchronously updates slave information by sending a status event to Splunk
+     *
+     * @param nodeName the name of the slave node to update
+     */
     @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     public static void updateSlaveInfoAsync(final String nodeName) {
         Computer.threadPoolForRemoting.submit(new Runnable() {
@@ -650,6 +762,8 @@ public class LogEventHelper {
     }
 
     /**
+     * <p>getRelativeJenkinsHomePath.</p>
+     *
      * @param configPath the absolute path
      * @return the relative path to <code>JENKINS_HOME</code> directory
      */
@@ -662,6 +776,11 @@ public class LogEventHelper {
         return relativePath;
     }
 
+    /**
+     * Gets the default Groovy DSL script example
+     *
+     * @return the default DSL script content
+     */
     public static String getDefaultDslScript() {
         String exampleText = "//post script section";
         try (InputStream input = LogEventHelper.class.getClassLoader().getResourceAsStream("sample.groovy")) {
@@ -673,6 +792,8 @@ public class LogEventHelper {
     }
 
     /**
+     * <p>validateGroovyScript.</p>
+     *
      * @param script user input script to validate
      * @return error message if there is any
      */
@@ -694,7 +815,6 @@ public class LogEventHelper {
      * @param build          jenkins build
      * @return true if the publisher is defined, false otherwise
      */
-
     public static boolean hasPublisherName(String shortClassName, Run build) {
         boolean found = false;
         if (!(build instanceof AbstractBuild)) {
@@ -716,6 +836,8 @@ public class LogEventHelper {
     }
 
     /**
+     * <p>getRunDuration.</p>
+     *
      * @param run an execution of job
      * @return job duration
      */
@@ -729,6 +851,12 @@ public class LogEventHelper {
         return duration;
     }
 
+    /**
+     * Appends SCM information to an event if there are no key conflicts
+     *
+     * @param eventToAppend the event map to append to
+     * @param run the Jenkins build run
+     */
     public static void appendScm(Map eventToAppend, Run run) {
         Map<String, Object> scmInfo = getScmInfo(run);
         //append scm info build parameter if no conflicts
@@ -739,6 +867,12 @@ public class LogEventHelper {
         }
     }
 
+    /**
+     * Gets SCM information from the build
+     *
+     * @param build the Jenkins build run
+     * @return a map containing SCM information
+     */
     public static Map<String, Object> getScmInfo(Run build) {
         SCMTriggerItem scmTrigger = SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(build.getParent());
         if (scmTrigger == null) {
@@ -766,6 +900,8 @@ public class LogEventHelper {
     }
 
     /**
+     * <p>getScmInfo.</p>
+     *
      * @param scmName scm class name
      * @param envVars environment variables
      * @return scm information, we only support git,svn and p4
@@ -806,6 +942,8 @@ public class LogEventHelper {
     }
 
     /**
+     * <p>getScmURL.</p>
+     *
      * @param envVars environment variables
      * @param prefix  scm prefix, such as GIT_URL, SVN_URL
      * @return parsed scm urls from build env, e.g. GIT_URL_1, GIT_URL_2, ... GIT_URL_10 or GIT_URL
@@ -832,6 +970,12 @@ public class LogEventHelper {
         return value;
     }
 
+    /**
+     * Converts an event record to a JSON string
+     *
+     * @param record the event record
+     * @return the JSON representation of the event
+     */
     public static String toJson(EventRecord record) {
         if (record == null) {
             return "\"empty record\"";
@@ -840,6 +984,11 @@ public class LogEventHelper {
         return gson.toJson(record.toMap(config));
     }
 
+    /**
+     * Gets the build version from the pom.properties file
+     *
+     * @return the build version, or "snapshot" if not found
+     */
     public static String getBuildVersion() {
         Properties properties = new Properties();
         try (InputStream pomInput = LogEventHelper.class.getResourceAsStream("/META-INF/maven/com.splunk.splunkins/splunk-devops/pom.properties")) {
@@ -853,6 +1002,8 @@ public class LogEventHelper {
     }
 
     /**
+     * <p>getBuildCauses.</p>
+     *
      * @param run Jenkins job run
      * @return causes separated by comma
      */

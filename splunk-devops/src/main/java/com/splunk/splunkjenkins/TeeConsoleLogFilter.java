@@ -44,27 +44,42 @@ public class TeeConsoleLogFilter extends ConsoleLogFilter implements Serializabl
     private static final String SUFFIX = "console";
     private String source;
 
+    /**
+     * <p>Constructor for TeeConsoleLogFilter.</p>
+     *
+     * @param source a {@link java.lang.String} object.
+     */
     public TeeConsoleLogFilter(String source) {
         this.source = source;
     }
 
+    /**
+     * <p>Constructor for TeeConsoleLogFilter.</p>
+     *
+     * @param run a {@link hudson.model.Run} object.
+     */
     public TeeConsoleLogFilter(Run run) {
         if (run != null) {
             this.source = run.getUrl() + SUFFIX;
         }
     }
 
+    /**
+     * <p>Constructor for TeeConsoleLogFilter.</p>
+     */
     public TeeConsoleLogFilter() {
         this.source = "Jobconsole";
     }
 
     //backwards compatibility
+    /** {@inheritDoc} */
     @Override
     public OutputStream decorateLogger(AbstractBuild build, OutputStream output) throws IOException, InterruptedException {
         return decorateLogger((Run) build, output);
     }
 
     //introduced in jenkins 1.632
+    /** {@inheritDoc} */
     public OutputStream decorateLogger(Run build, OutputStream output) throws IOException, InterruptedException {
         String logSource = this.source;
         boolean useLineNumber = true;
@@ -78,6 +93,7 @@ public class TeeConsoleLogFilter extends ConsoleLogFilter implements Serializabl
     }
 
     //introduced in jenkins 1.632
+    /** {@inheritDoc} */
     public OutputStream decorateLogger(Computer computer, OutputStream logger) throws IOException, InterruptedException {
         String logSource = this.source;
         if (computer != null) {

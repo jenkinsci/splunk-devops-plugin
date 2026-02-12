@@ -37,6 +37,10 @@ public class LoggingConfigListener extends SaveableListener {
     //queue.xml or build/*/config.xml
     private static final String IGNORE_CONFIG_CHANGE_PATTERN = "(?:queue|nodeMonitors|UpdateCenter|global-build-stats).xml|" +
             "/(?:fingerprint|builds|config-history)/.*?xml";
+    /**
+     * Regex pattern for configuration files to ignore (queue.xml, nodeMonitors, build artifacts, etc.)
+     * Can be overridden with system property splunkins.ignoreConfigChangePattern
+     */
     public static final Pattern IGNORED;
 
     static {
@@ -52,6 +56,14 @@ public class LoggingConfigListener extends SaveableListener {
 
     private WeakHashMap cached = new WeakHashMap(512);
 
+    /**
+     * {@inheritDoc}
+     *
+     * Captures Jenkins configuration changes and sends them to Splunk for audit trail
+     * purposes. Uses MD5 checksums to deduplicate events and prevent duplicate logging
+     * when configuration is saved multiple times. Ignores changes from system users
+     * and certain configuration files (queue, node monitors, etc).
+     */
     @Override
     public void onChange(Saveable saveable, XmlFile file) {
         if (!SplunkJenkinsInstallation.isLogHandlerRegistered()) {

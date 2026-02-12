@@ -17,30 +17,39 @@ import static com.splunk.splunkjenkins.Constants.EVENT_CAUSED_BY;
 import static com.splunk.splunkjenkins.model.EventType.SLAVE_INFO;
 import static com.splunk.splunkjenkins.utils.LogEventHelper.getComputerStatus;
 
+/**
+ * Listens for Jenkins agent/computer events and sends status updates to Splunk.
+ * Tracks online/offline status changes and launch failures.
+ */
 @SuppressWarnings("unused")
 @Extension
 public class LoggingComputerListener extends ComputerListener {
+    /** {@inheritDoc} */
     @Override
     public void onOnline(Computer c, TaskListener listener) throws IOException, InterruptedException {
         updateStatus(c, "Online");
         listener.getLogger().flush();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onOffline(@NonNull Computer c, @CheckForNull OfflineCause cause) {
         updateStatus(c, "Offline");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onTemporarilyOnline(Computer c) {
         updateStatus(c, "Temporarily Online");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onTemporarilyOffline(Computer c, OfflineCause cause) {
         updateStatus(c, "Temporarily Offline");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onLaunchFailure(Computer c, TaskListener taskListener) throws IOException, InterruptedException {
         updateStatus(c, "Launch Failure");

@@ -20,16 +20,22 @@ import java.util.regex.Pattern;
 import static com.splunk.splunkjenkins.Constants.TAG;
 import static com.splunk.splunkjenkins.model.EventType.JENKINS_CONFIG;
 
+/**
+ * Servlet filter that logs Jenkins configuration changes and user actions to Splunk.
+ * Captures POST requests for audit trail purposes.
+ */
 public class WebPostAccessLogger implements Filter {
     private static final Logger LOG = Logger.getLogger(WebPostAccessLogger.class.getName());
     // Package-visible for testing
     static final Pattern FILTER_PATTERN = Pattern.compile("/(?:configSubmit|createSubmit|updateSubmit|script|doDelete)");
 
+    /** {@inheritDoc} */
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         LOG.info("splunk-filter loaded");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         try {
@@ -66,6 +72,7 @@ public class WebPostAccessLogger implements Filter {
         SplunkLogService.getInstance().send(auditInfo, JENKINS_CONFIG, "web_access");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void destroy() {
 

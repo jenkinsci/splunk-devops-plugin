@@ -8,8 +8,17 @@ import hudson.tasks.junit.TestResultAction;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter for JUnit test results.
+ * Converts JUnit test results to Splunk format for analysis.
+ */
 @Extension(optional = true)
 public class JunitResultAdapter extends AbstractTestResultAdapter<TestResultAction> {
+    /**
+     * {@inheritDoc}
+     *
+     * Gets the test results from a JUnit test result action
+     */
     @Override
     public List<TestCaseResult> getTestResult(TestResultAction resultAction) {
         List<TestCaseResult> caseResults = new ArrayList<>();
@@ -23,8 +32,11 @@ public class JunitResultAdapter extends AbstractTestResultAdapter<TestResultActi
     }
 
     /**
-     * @param methodResult
-     * @return unified test case result
+     * Converts a JUnit case result to a unified test case result
+     *
+     * @param methodResult the JUnit method result
+     * @param suiteName the test suite name
+     * @return the unified test case result
      */
     private TestCaseResult convert(CaseResult methodResult, String suiteName) {
         String buildUrl = "";
