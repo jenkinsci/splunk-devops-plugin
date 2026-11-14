@@ -111,6 +111,42 @@ public class PipelineRunSupportStagesTest {
         assertEquals("SUCCESS", stages.get("pa").get("status"));
     }
 
+    @Test
+    public void declarativeSkippedStages() throws Exception {
+        WorkflowJob p = r.createProject(WorkflowJob.class);
+        p.setDefinition(new CpsFlowDefinition("pipeline {\n" +
+                "  agent none\n" +
+                "  stages {\n" +
+                "    stage('build') { steps { echo 'build' } }\n" +
+                "    stage('conditional') {\n" +
+                "      when { expression { false } }\n" +
+                "      steps { echo 'never' }\n" +
+                "    }\n" +
+                "    stage('deploy') { steps { error 'boom' } }\n" +
+                "    stage('afterFailure') { steps { echo 'never' } }\n" +
+                "  }\n" +
+                "}", true));
+        WorkflowRun b = r.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0));
+        Map<String, Map<String, Object>> stages = stagesByName(b);
+
+        assertEquals("SUCCESS", stages.get("build").get("status"));
+        Map<String, Object> deploy = stages.get("deploy");
+        assertEquals("FAILURE", deploy.get("status"));
+        assertEquals("boom", deploy.get("error"));
+        assertEquals("hudson.AbortException", deploy.get("error_type"));
+
+        // skipped by the when condition, and skipped because of the earlier failure (which still propagates through it)
+        for (String skipped : List.of("conditional", "afterFailure")) {
+            Map<String, Object> stage = stages.get(skipped);
+            assertEquals(skipped, "NOT_BUILT", stage.get("status"));
+            assertEquals(skipped, 0f, stage.get("duration"));
+            assertEquals(skipped, 0f, stage.get("pause_duration"));
+            assertFalse(skipped, stage.containsKey("error"));
+            assertFalse(skipped, stage.containsKey("error_type"));
+            assertFalse(skipped, stage.containsKey("children"));
+        }
+    }
+
     private static List<Map<String, Object>> stages(WorkflowRun b) {
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> stages = (List<Map<String, Object>>) new PipelineRunSupport().extract(b, true).get("stages");
