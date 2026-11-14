@@ -37,11 +37,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jenkins-ci.plugins.pipeline-stage-view</groupId>
-            <artifactId>pipeline-rest-api</artifactId>
-            <version>2.8</version>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>splunk-devops</artifactId>
             <version>${project.version}</version>
@@ -119,13 +114,51 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>structs</artifactId>
-            <version>308.v852b473a2b8c</version>
+            <version>318.va_f3ccb_729b_71</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>scm-api</artifactId>
             <version>608.vfa_f971c5a_a_e9</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>pipeline-stage-step</artifactId>
+            <version>293.v200037eefcd5</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Declarative brings in versions built for a core older than 2.281,
+             which form a dependency cycle with the sshd plugin bundled in newer cores -->
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>credentials</artifactId>
+            <version>1139.veb_9579fca_33b_</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>ssh-credentials</artifactId>
+            <version>305.v8f4381501156</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>trilead-api</artifactId>
+            <version>1.67.vc3938a_35172f</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>jackson2-api</artifactId>
+            <version>2.13.1-246.va8a9f3eaf46a</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkinsci.plugins</groupId>
+            <artifactId>pipeline-model-definition</artifactId>
+            <version>1.9.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
