@@ -1,3 +1,6 @@
+### 1.11.3 (Nov 17, 2026)
+- fix JENKINS-76585 config file missing eol
+
 ### 1.11.2 (Feb 9, 2026)
 - JENKINS-76340 check if it should enable remote decorator for all SplunkConsoleTaskListenerDecorator objects, thanks to [Marina Mota](https://github.com/marinamota18)
 - override RunActionFactory.actionType, thanks to [Jesse Glick](https://github.com/jglick)
