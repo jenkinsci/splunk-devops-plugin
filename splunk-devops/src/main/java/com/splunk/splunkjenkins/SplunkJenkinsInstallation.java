@@ -773,7 +773,7 @@ public class SplunkJenkinsInstallation extends GlobalConfiguration {
         map.put("host", host);
         map.put("port", port);
         map.put("useSSL", useSSL);
-        map.put("metaDataConfig", Util.fixNull(defaultMetaData) + Util.fixNull(metaDataConfig));
+        map.put("metaDataConfig", Util.fixNull(defaultMetaData) + "\n" + Util.fixNull(metaDataConfig));
         map.put("retriesOnError", retriesOnError);
         map.put("metadataHost", metadataHost);
         map.put("metadataSource", metadataSource);
